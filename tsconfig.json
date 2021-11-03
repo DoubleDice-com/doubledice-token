@@ -1,0 +1,18 @@
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "moduleResolution": "Node",
+    "esModuleInterop": true,
+    "strict": true,
+    "module": "CommonJS",
+    "allowSyntheticDefaultImports": true,
+  },
+  "include": [
+    "./typechain",
+    "./test",
+    "./scripts",
+  ],
+  "files": [
+    "./hardhat.config.ts",
+  ],
+}
