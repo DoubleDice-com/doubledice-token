@@ -36,21 +36,22 @@ class Helper {
     _noWait?: boolean,
   }): Promise<[DoubleDiceTokenVesting, Promise<ContractTransaction>]> {
 
-    const vestingContractFactory = new DoubleDiceTokenVesting__factory(this.tokenHolder);
+    const nonceToBeUsedForDeployment = (await this.tokenHolder.getTransactionCount()) + (_skipApproval ? 0 : 1);
 
-    const contract = await vestingContractFactory.deploy(
-      this.token.address,
-      this.tokenHolder.address,
-      user.address
-    );
-
-    await contract.deployed();
+    const precalculatedContractAddress = ethers.utils.getContractAddress({
+      from: this.tokenHolder.address,
+      nonce: nonceToBeUsedForDeployment
+    });
 
     if (!_skipApproval) {
-      await (await this.token.connect(this.tokenHolder).increaseAllowance(contract.address, grantAmount)).wait();
+      await (await this.token.connect(this.tokenHolder).increaseAllowance(precalculatedContractAddress, grantAmount)).wait();
     }
 
-    const tx = contract.addTokenGrant(
+    const vestingContractFactory = new DoubleDiceTokenVesting__factory(this.tokenHolder);
+
+    const txRequest = vestingContractFactory.getDeployTransaction(
+      this.token.address,
+      user.address,
       startTime,
       grantAmount,
       vestingDuration,
@@ -58,8 +59,15 @@ class Helper {
       initiallyClaimableAmount
     );
 
+    const tx = this.tokenHolder.sendTransaction(txRequest);
+
+    let contract: DoubleDiceTokenVesting;
     if (!_noWait) {
-      await (await tx).wait();
+      const { contractAddress } = await (await tx).wait();
+      expect(contractAddress).to.eq(precalculatedContractAddress);
+      contract = vestingContractFactory.attach(contractAddress);
+    } else {
+      contract = vestingContractFactory.attach('0x0000000000000000000000000000000000000000');
     }
 
     return [contract, tx];
@@ -244,7 +252,6 @@ describe('Token Vesting Simple Test ', () => {
         grantAmount: USER_1_GRANT_AMOUNT,
         vestingDuration,
         vestingCliff,
-        _noWait: true
       });
 
       await expect(tx).to.emit(vestingContract, 'GrantAdded').withArgs(
@@ -253,34 +260,6 @@ describe('Token Vesting Simple Test ', () => {
         vestingDuration,
         vestingCliff
       );
-    });
-
-    it.skip('should error if called by anyone but the Contract Owner', async () => {
-      const vestingDuration = 24;
-      const vestingCliff = 6;
-
-      const vestingContract = (await new DoubleDiceTokenVesting__factory(tokenHolder).deploy(
-        token.address,
-        tokenHolder.address,
-        USER1.address
-      )) as DoubleDiceTokenVesting;
-
-      // Approve the amount balance to be transferred by the vesting contract as part of the `addTokenGrant` call
-      await (
-        await token
-          .connect(tokenHolder)
-          .approve(vestingContract.address, USER_1_GRANT_AMOUNT)
-      ).wait();
-
-      await expect(
-        vestingContract.connect(USER0).addTokenGrant(
-          currentTime + SECONDS_PER_MONTH,
-          USER_1_GRANT_AMOUNT.toBigInt(),
-          vestingDuration,
-          vestingCliff,
-          0
-        )
-      ).to.be.revertedWith('caller is not the owner');
 
     });
 
@@ -294,42 +273,6 @@ describe('Token Vesting Simple Test ', () => {
         _noWait: true
       });
       await expect(tx).to.be.revertedWith('cliff-longer-than-duration');
-    });
-
-    it.skip('should error if there is an existing grant', async () => {
-      const vestingContract = (await new DoubleDiceTokenVesting__factory(tokenHolder).deploy(
-        token.address,
-        tokenHolder.address,
-        USER1.address
-      )) as DoubleDiceTokenVesting;
-
-      // Approve the amount balance to be transferred by the vesting contract as part of the `addTokenGrant` call
-      await (
-        await token
-          .connect(tokenHolder)
-          .approve(vestingContract.address, USER_1_GRANT_AMOUNT)
-      ).wait();
-
-      await (
-        await vestingContract.addTokenGrant(
-          currentTime + SECONDS_PER_MONTH,
-          USER_1_GRANT_AMOUNT.toBigInt(),
-          24,
-          6,
-          0
-        )
-      ).wait();
-
-      await expect(
-        vestingContract.addTokenGrant(
-          currentTime + SECONDS_PER_MONTH,
-          USER_1_GRANT_AMOUNT.toBigInt(),
-          24,
-          6,
-          0
-        )
-      ).to.be.revertedWith('token-user-grant-exists');
-
     });
 
     it('should error if cliff is 0', async () => {
@@ -369,7 +312,7 @@ describe('Token Vesting Simple Test ', () => {
     });
 
     it('should error on grant duration overflow', async () => {
-      const [, tx] = await helper.deploy({
+      const op = helper.deploy({
         user: USER1,
         startTime: currentTime + SECONDS_PER_MONTH,
         grantAmount: USER_1_GRANT_AMOUNT,
@@ -377,7 +320,7 @@ describe('Token Vesting Simple Test ', () => {
         vestingCliff: 6,
         _noWait: true
       });
-      await expect(tx).to.be.rejectedWith(/out-of-bounds/);
+      await expect(op).to.be.rejectedWith(/out-of-bounds/);
     });
 
     it('should error if grant amount cannot be transferred', async () => {
@@ -514,42 +457,6 @@ describe('Token Vesting Simple Test ', () => {
       // Expecting non-vested tokens here to = total grant amount - 16 months worth of vested tokens
       const vestedAmountOver16Months = grantClaimAfter7month[1].add(grantClaimAfter13month[1]).add(grantClaimAfter16month[1]);
       expect(balanceChangeMultiSig).to.eq(USER_1_GRANT_AMOUNT.sub(vestedAmountOver16Months).sub(initiallyClaimableAmount));
-    });
-
-    // ToDo:
-    // How can it "be able to add a new grant when removed"
-    // if removeGrant self-destructs contract?
-    // This test only passes because an entirely new TokenVesting contract is deployed
-    // and grant is added on that one.
-    it.skip('should be able to add a new grant when removed', async () => {
-      await (await vestingContract.removeTokenGrant()).wait();
-
-
-      vestingContract = (await new DoubleDiceTokenVesting__factory(tokenHolder).deploy(
-        token.address,
-        tokenHolder.address,
-        USER1.address
-      )) as DoubleDiceTokenVesting;
-
-      // Approve the amount balance to be transferred by the vesting contract as part of the `addTokenGrant` call
-      await (
-        await token
-          .connect(tokenHolder)
-          .approve(vestingContract.address, USER_1_GRANT_AMOUNT)
-      ).wait();
-
-      await (
-        await vestingContract.addTokenGrant(
-          currentTime + SECONDS_PER_MONTH,
-          USER_1_GRANT_AMOUNT.toBigInt(),
-          24,
-          6,
-          0
-        )
-      ).wait();
-
-      const grant = await vestingContract.tokenGrant();
-      expect(grant.amount).to.eq(USER_1_GRANT_AMOUNT);
     });
 
     it('should error if called by anyone but the Owner', async () => {
@@ -732,17 +639,20 @@ describe('Token Vesting Simple Test ', () => {
     });
 
     it('should be able to handle multiple grants correctly over time', async () => {
-      USERS_VESTING_CONTRACTS = await Promise.all(
-        grantProperties.map(async ({ account, amount, duration, cliff }): Promise<DoubleDiceTokenVesting> => {
-          const [contract] = await helper.deploy({
-            user: account,
-            grantAmount: amount,
-            vestingDuration: duration,
-            vestingCliff: cliff,
-          });
-          return contract;
-        })
-      );
+      // Note: we must wait for 1 contract to be deployed before proceeding to the next,
+      // otherwise if we use Promise.all, all the getTransactionCount() in deploy() will
+      // happen concurrently and return the same value, and the address of the contracts
+      // of different users will be precalculated to be all the same.
+      USERS_VESTING_CONTRACTS = [];
+      for (const { account, amount, duration, cliff } of grantProperties) {
+        const [contract] = await helper.deploy({
+          user: account,
+          grantAmount: amount,
+          vestingDuration: duration,
+          vestingCliff: cliff,
+        });
+        USERS_VESTING_CONTRACTS.push(contract);
+      }
 
       let balanceBefore;
       let balanceAfter;

@@ -14,7 +14,6 @@ contract DoubleDiceTokenVesting is Ownable {
 
     IDoubleDiceToken public token;
     address public tokenAddress;
-    address public dodiOwner;
 
     uint constant internal SECONDS_PER_MONTH = 2628000;
 
@@ -45,32 +44,21 @@ contract DoubleDiceTokenVesting is Ownable {
         _;
     }
 
-    modifier noGrantExists() {
-        require(tokenGrant.startTime == 0, "token-user-grant-exists");
-        _;
-    }
-
     modifier onlyUser {
         require(_msgSender() == userAddress, "only-user-is-authorized");
         _;
     }
 
-    constructor(address _tokenAddress, address _dodiOwner, address _userAddress)
+    constructor(
+        address _tokenAddress, address _userAddress,
+        uint256 _startTime, uint256 _amount, uint32 _vestingDuration, uint32 _vestingCliff, uint256 _initiallyClaimableAmount
+    )
     nonZeroAddress(_tokenAddress)
-    nonZeroAddress(_dodiOwner)
-    Ownable()
     {
         tokenAddress = _tokenAddress;
-        dodiOwner = _dodiOwner;
         userAddress = _userAddress;
         token = IDoubleDiceToken(tokenAddress);
-    }
 
-
-    function addTokenGrant(uint256 _startTime, uint256 _amount, uint32 _vestingDuration, uint32 _vestingCliff, uint256 _initiallyClaimableAmount) external
-    onlyOwner
-    noGrantExists
-    {
         require(_vestingCliff > 0, "zero-vesting-cliff");
         require(_vestingDuration > _vestingCliff, "cliff-longer-than-duration");
         require(_initiallyClaimableAmount < _amount, "Initial claimable should be less than the total amount");
@@ -87,7 +75,7 @@ contract DoubleDiceTokenVesting is Ownable {
         tokenGrant.initialClaimableCollected = false;
 
         // Transfer the grant tokens under the control of the vesting contract
-        token.transferFrom(dodiOwner, address(this), _amount);
+        token.transferFrom(owner(), address(this), _amount);
 
         emit GrantAdded(tokenGrant.startTime, _amount, _vestingDuration, _vestingCliff);
     }
@@ -128,7 +116,7 @@ contract DoubleDiceTokenVesting is Ownable {
         tokenGrant.initiallyClaimableAmount = 0;
 
         token.transfer(userAddress, amountUserDeserve);
-        token.transfer(dodiOwner, amountNotVested);
+        token.transfer(owner(), amountNotVested);
 
         emit GrantRemoved(amountVested, amountNotVested);
 
