@@ -1,35 +1,18 @@
 import { expect } from 'chai';
 import { BigNumber, BigNumberish } from 'ethers';
-import { ethers, waffle } from 'hardhat';
+import { ethers } from 'hardhat';
 import { DoubleDiceToken } from '../typechain';
-
-
-export const toBigNumber = (amount: number, decimals = 18) => {
-  return BigNumber.from(10).pow(decimals).mul(amount);
-};
 
 export const MULTIPLIER = BigNumber.from(10).pow(48);
 
 export async function forwardTime(seconds: number) {
-  await waffle.provider.send('evm_increaseTime', [seconds]);
-  await waffle.provider.send('evm_mine', []);
+  await ethers.provider.send('evm_increaseTime', [seconds]);
+  await ethers.provider.send('evm_mine', []);
 }
 
 export async function currentBlockTime() {
-  const res = await waffle.provider.getBlock('latest');
-  return res.timestamp;
-}
-
-export async function checkErrorRevert(txPromise: any, errorMessage: string) {
-  try {
-    const result = await txPromise;
-    if (result) {
-      await result.wait();
-    }
-    throw new Error('An error should have been thrown');
-  } catch (err: any) {
-    expect(err.message).to.contain(errorMessage);
-  }
+  const { timestamp } = await ethers.provider.getBlock('latest');
+  return timestamp;
 }
 
 /**
