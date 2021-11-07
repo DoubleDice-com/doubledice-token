@@ -1,14 +1,15 @@
 // SPDX-License-Identifier: Unlicensed
 pragma solidity 0.8.6;
 
-
-import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/math/SafeCast.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
+import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
+
 import "./IDoubleDiceToken.sol";
 
 
-contract DoubleDiceTokenVesting is Ownable {
+contract DoubleDiceTokenVesting is OwnableUpgradeable {
     using SafeCast for uint256;
     using SafeERC20 for IERC20;
 
@@ -49,12 +50,16 @@ contract DoubleDiceTokenVesting is Ownable {
         _;
     }
 
-    constructor(
+    function initialize(
         address _tokenAddress, address _userAddress,
         uint256 _startTime, uint256 _amount, uint32 _vestingDuration, uint32 _vestingCliff, uint256 _initiallyClaimableAmount
     )
+    external
+    initializer
     nonZeroAddress(_tokenAddress)
     {
+        __Ownable_init();
+
         tokenAddress = _tokenAddress;
         userAddress = _userAddress;
         token = IDoubleDiceToken(tokenAddress);
@@ -119,8 +124,6 @@ contract DoubleDiceTokenVesting is Ownable {
         token.transfer(owner(), amountNotVested);
 
         emit GrantRemoved(amountVested, amountNotVested);
-
-        selfdestruct(payable(_msgSender()));
     }
 
     /// @notice Allows a grant recipient to claim their vested tokens. Errors if no tokens have vested

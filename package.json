@@ -24,6 +24,7 @@
     "@nomiclabs/hardhat-ethers": "2.0.2",
     "@nomiclabs/hardhat-waffle": "2.0.1",
     "@openzeppelin/contracts": "4.3.2",
+    "@openzeppelin/contracts-upgradeable": "4.3.2",
     "@openzeppelin/test-helpers": "0.5.15",
     "@sindresorhus/is": "0.14.0",
     "@typechain/ethers-v5": "7.2.0",

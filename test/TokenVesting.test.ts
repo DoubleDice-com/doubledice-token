@@ -3,7 +3,7 @@ import chai, { expect } from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import { BigNumber, BigNumberish, ContractTransaction } from 'ethers';
 import { ethers } from 'hardhat';
-import { DoubleDiceToken, DoubleDiceTokenVesting, DoubleDiceTokenVesting__factory, DoubleDiceToken__factory } from '../typechain';
+import { DoubleDiceToken, DoubleDiceTokenVesting, DoubleDiceTokenVestingProxyFactory, DoubleDiceTokenVestingProxyFactory__factory, DoubleDiceTokenVesting__factory, DoubleDiceToken__factory } from '../typechain';
 import { $, currentBlockTime, forwardTime } from './utils';
 
 chai.use(chaiAsPromised);
@@ -13,6 +13,7 @@ const SECONDS_PER_MONTH = 2628000;
 class Helper {
   constructor(
     public token: DoubleDiceToken,
+    public tokenVestingProxyFactory: DoubleDiceTokenVestingProxyFactory,
     public tokenHolder: SignerWithAddress
   ) { }
 
@@ -36,21 +37,12 @@ class Helper {
     _noWait?: boolean,
   }): Promise<[DoubleDiceTokenVesting, Promise<ContractTransaction>]> {
 
-    const nonceToBeUsedForDeployment = (await this.tokenHolder.getTransactionCount()) + (_skipApproval ? 0 : 1);
-
-    const precalculatedContractAddress = ethers.utils.getContractAddress({
-      from: this.tokenHolder.address,
-      nonce: nonceToBeUsedForDeployment
-    });
-
     if (!_skipApproval) {
-      await (await this.token.connect(this.tokenHolder).increaseAllowance(precalculatedContractAddress, grantAmount)).wait();
+      await (await this.token.connect(this.tokenHolder).increaseAllowance(this.tokenVestingProxyFactory.address, grantAmount)).wait();
     }
 
-    const vestingContractFactory = new DoubleDiceTokenVesting__factory(this.tokenHolder);
-
-    const txRequest = vestingContractFactory.getDeployTransaction(
-      this.token.address,
+    const tx = this.tokenVestingProxyFactory.createDoubleDiceTokenVestingProxy(
+      this.tokenHolder.address,
       user.address,
       startTime,
       grantAmount,
@@ -59,18 +51,22 @@ class Helper {
       initiallyClaimableAmount
     );
 
-    const tx = this.tokenHolder.sendTransaction(txRequest);
+    let proxyAddress: string;
 
-    let contract: DoubleDiceTokenVesting;
     if (!_noWait) {
-      const { contractAddress } = await (await tx).wait();
-      expect(contractAddress).to.eq(precalculatedContractAddress);
-      contract = vestingContractFactory.attach(contractAddress);
+      const { events } = await (await tx).wait();
+      const event = events?.find(({ event }) => event === 'DoubleDiceTokenVestingProxyCreation');
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      const { args } = event!;
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      ({ proxyAddress } = args!);
     } else {
-      contract = vestingContractFactory.attach('0x0000000000000000000000000000000000000000');
+      proxyAddress = '0x0000000000000000000000000000000000000000';
     }
 
-    return [contract, tx];
+    const instance = new DoubleDiceTokenVesting__factory(this.tokenHolder).attach(proxyAddress);
+
+    return [instance, tx];
   }
 }
 
@@ -80,6 +76,8 @@ describe('Token Vesting Simple Test ', () => {
   let currentTime: number;
 
   let tokenHolder: SignerWithAddress;
+  let tokenVestingDeployer: SignerWithAddress;
+  let tokenVestingProxyFactoryOwner: SignerWithAddress;
   let tokenOwner: SignerWithAddress;
   let USER0: SignerWithAddress;
   let USER1: SignerWithAddress;
@@ -124,6 +122,8 @@ describe('Token Vesting Simple Test ', () => {
   before(async () => {
     [
       tokenHolder,
+      tokenVestingDeployer,
+      tokenVestingProxyFactoryOwner,
       tokenOwner,
       USER0,
       USER1,
@@ -164,7 +164,15 @@ describe('Token Vesting Simple Test ', () => {
     );
     await token.deployed();
 
-    helper = new Helper(token, tokenHolder);
+    const tokenVestingMasterCopy = await new DoubleDiceTokenVesting__factory(tokenVestingDeployer).deploy();
+    await tokenVestingMasterCopy.deployed();
+
+    const tokenVestingProxyFactory = (
+      await new DoubleDiceTokenVestingProxyFactory__factory(tokenVestingProxyFactoryOwner)
+        .deploy(token.address, tokenVestingMasterCopy.address)
+    ).connect(tokenVestingProxyFactoryOwner);
+
+    helper = new Helper(token, tokenVestingProxyFactory, tokenHolder);
   });
 
   describe('when creating vesting contract for a user ', () => {
@@ -312,7 +320,7 @@ describe('Token Vesting Simple Test ', () => {
     });
 
     it('should error on grant duration overflow', async () => {
-      const op = helper.deploy({
+      const [, tx] = await helper.deploy({
         user: USER1,
         startTime: currentTime + SECONDS_PER_MONTH,
         grantAmount: USER_1_GRANT_AMOUNT,
@@ -320,7 +328,7 @@ describe('Token Vesting Simple Test ', () => {
         vestingCliff: 6,
         _noWait: true
       });
-      await expect(op).to.be.rejectedWith(/out-of-bounds/);
+      await expect(tx).to.be.rejectedWith(/out-of-bounds/);
     });
 
     it('should error if grant amount cannot be transferred', async () => {
@@ -352,14 +360,6 @@ describe('Token Vesting Simple Test ', () => {
         vestingCliff,
         initiallyClaimableAmount,
       });
-    });
-
-    it('should remove the grant and destruct contract', async () => {
-      await (await vestingContract.removeTokenGrant()).wait();
-
-      await expect(
-        vestingContract.tokenGrant()
-      ).to.be.rejectedWith(/call revert exception/);
     });
 
     it('should log correct event', async () => {
