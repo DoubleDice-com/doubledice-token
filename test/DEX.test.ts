@@ -1,6 +1,6 @@
 import { ethers } from 'hardhat';
 import { DoubleDiceTokenInternal__factory } from '../typechain';
-import { $, EvmCheckpoint, TokenHelper, UNCLAIMED_DISTRIBUTED_YIELD_ACCOUNT, UNDISTRIBUTED_YIELD_ACCOUNT } from './utils';
+import { $, EvmCheckpoint, TokenHelper, UNCLAIMED_DISTRIBUTED_YIELD_ACCOUNT, UNDISTRIBUTED_YIELD_ACCOUNT } from './lib/utils';
 
 describe('DEX', () => {
 

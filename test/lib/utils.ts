@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import { BigNumber, BigNumberish } from 'ethers';
 import { ethers } from 'hardhat';
-import { DoubleDiceToken } from '../typechain';
+import { DoubleDiceToken } from '../../typechain';
 
 export const MULTIPLIER = BigNumber.from(10).pow(48);
 

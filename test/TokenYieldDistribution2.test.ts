@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import { ethers } from 'hardhat';
 import { DoubleDiceToken__factory } from '../typechain';
-import { $, EvmCheckpoint, TokenHelper } from './utils';
+import { $, EvmCheckpoint, TokenHelper } from './lib/utils';
 
 describe('Yield distribution (alternative)', () => {
 
