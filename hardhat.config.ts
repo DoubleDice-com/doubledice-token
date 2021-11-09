@@ -50,10 +50,7 @@ export default <HardhatUserConfig>{
     settings: {
       optimizer: {
         enabled: true,
-        runs: 800,
-      },
-      metadata: {
-        bytecodeHash: 'none',
+        runs: 200,
       },
     },
   },
