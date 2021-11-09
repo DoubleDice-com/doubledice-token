@@ -51,31 +51,40 @@ async function main() {
   console.log(`* INIT_TOKEN_HOLDER = ${INIT_TOKEN_HOLDER_ADDRESS} (all non-yield tokens will be transferred here, ensure you can control this account)`);
   console.log();
 
-  await pressAnyKey(`to deploy to network "${name}" (🔗 ${chainId})`);
+  // eslint-disable-next-line no-constant-condition
+  while (true) {
+    await pressAnyKey(`to deploy to network "${name}" (🔗 ${chainId})`);
 
-  const factory = new DoubleDiceToken__factory(owner);
-  const contract = await factory.deploy(
-    initTokenSupply,
-    totalYieldAmount,
-    INIT_TOKEN_HOLDER_ADDRESS,
-    {
-      type: 2,
-      maxFeePerGas,
-      maxPriorityFeePerGas,
+    try {
+      const factory = new DoubleDiceToken__factory(owner);
+      const contract = await factory.deploy(
+        initTokenSupply,
+        totalYieldAmount,
+        INIT_TOKEN_HOLDER_ADDRESS,
+        {
+          type: 2,
+          maxFeePerGas,
+          maxPriorityFeePerGas,
 
-      //  simplify the process of deploying to the same address across chains
-      nonce: 0,
+          //  simplify the process of deploying to the same address across chains
+          nonce: 0,
+        }
+      );
+
+      const { deployTransaction: { hash } } = contract;
+
+      console.log(`Tx sent with hash ${hash}`);
+      console.log(`Waiting for deployment to ${contract.address}...`);
+      await contract.deployed();
+
+      const { blockNumber, blockHash } = await contract.deployTransaction.wait();
+      console.log(`Contract deployed to ${contract.address}, tx mined in block № ${blockNumber} (${blockHash})`);
+    } catch (e) {
+      console.error(e);
+      continue;
     }
-  );
-
-  const { deployTransaction: { hash } } = contract;
-
-  console.log(`Tx sent with hash ${hash}`);
-  console.log(`Waiting for deployment to ${contract.address}...`);
-  await contract.deployed();
-
-  const { blockNumber, blockHash } = await contract.deployTransaction.wait();
-  console.log(`Contract deployed to ${contract.address}, tx mined in block № ${blockNumber} (${blockHash})`);
+    break;
+  }
 }
 
 main()
