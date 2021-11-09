@@ -2,8 +2,8 @@ import { expect } from 'chai';
 import { BigNumber, BigNumberish } from 'ethers';
 import { ethers } from 'hardhat';
 import { DoubleDiceToken } from '../../typechain';
+import { UNCLAIMED_DISTRIBUTED_YIELD_ACCOUNT, UNDISTRIBUTED_YIELD_ACCOUNT } from './constants';
 
-export const MULTIPLIER = BigNumber.from(10).pow(48);
 
 export async function forwardTime(seconds: number) {
   await ethers.provider.send('evm_increaseTime', [seconds]);
@@ -88,12 +88,6 @@ export class TokenHelper {
     return actual;
   }
 }
-
-export const [TOKEN_NAME, TOKEN_SYMBOL, TOKEN_DECIMALS] = ['DoubleDice Token', 'DODI', 18];
-
-export const UNDISTRIBUTED_YIELD_ACCOUNT = '0xD0D1000000000000000000000000000000000001';
-
-export const UNCLAIMED_DISTRIBUTED_YIELD_ACCOUNT = '0xd0D1000000000000000000000000000000000002';
 
 export const isReservedAccount = (addressOrSigner: AddressOrSigner): boolean => {
   return [

@@ -2,7 +2,14 @@ import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import { expect } from 'chai';
 import { ethers } from 'hardhat';
 import { DoubleDiceToken, DoubleDiceToken__factory } from '../typechain';
-import { $, EvmCheckpoint, TokenHelper, TOKEN_DECIMALS, TOKEN_NAME, TOKEN_SYMBOL, UNCLAIMED_DISTRIBUTED_YIELD_ACCOUNT, UNDISTRIBUTED_YIELD_ACCOUNT } from './lib/utils';
+import {
+  TOKEN_DECIMALS,
+  TOKEN_NAME,
+  TOKEN_SYMBOL,
+  UNCLAIMED_DISTRIBUTED_YIELD_ACCOUNT,
+  UNDISTRIBUTED_YIELD_ACCOUNT
+} from './lib/constants';
+import { $, EvmCheckpoint, TokenHelper } from './lib/utils';
 
 describe('DoubleDiceToken', function () {
 
