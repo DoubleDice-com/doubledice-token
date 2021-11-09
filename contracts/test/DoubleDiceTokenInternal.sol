@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: Unlicensed
+// SPDX-License-Identifier: UNLICENSED
 pragma solidity 0.8.6;
 
 import "../DoubleDiceToken.sol";
@@ -13,13 +13,13 @@ contract DoubleDiceTokenInternal is DoubleDiceToken {
         DoubleDiceToken(
             initTotalSupply,
             totalYieldAmount,
-            initTokenHolder            
+            initTokenHolder
         )
     { // solhint-disable-line no-empty-blocks
-    } 
+    }
 
     function isReservedAccount(address account) external pure returns (bool) {
-        return _isReservedAccount(account);        
+        return _isReservedAccount(account);
     }
 
     function factor() external view returns (uint256) {
@@ -29,5 +29,5 @@ contract DoubleDiceTokenInternal is DoubleDiceToken {
     function entryOf(address account) external view returns (AccountEntry memory) {
         return _entries[account];
     }
-    
+
 }
