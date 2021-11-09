@@ -3,7 +3,7 @@ import chai, { expect } from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import { BigNumber, BigNumberish, ContractTransaction } from 'ethers';
 import { ethers } from 'hardhat';
-import { DoubleDiceToken, DoubleDiceTokenVesting, DoubleDiceTokenVestingProxyFactory, DoubleDiceTokenVestingProxyFactory__factory, DoubleDiceTokenVesting__factory, DoubleDiceToken__factory } from '../typechain';
+import { DoubleDiceToken, DoubleDiceTokenVesting, DoubleDiceTokenVestingProxyFactory, DoubleDiceTokenVestingProxyFactory__factory, DoubleDiceTokenVesting__factory, DoubleDiceToken__factory } from '../typechain-types';
 import { $, currentBlockTime, forwardTime } from './lib/utils';
 
 chai.use(chaiAsPromised);

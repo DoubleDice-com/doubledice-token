@@ -1,5 +1,5 @@
 import { ethers } from 'hardhat';
-import { DoubleDiceTokenInternal__factory } from '../typechain';
+import { DoubleDiceTokenInternal__factory } from '../typechain-types';
 import { UNCLAIMED_DISTRIBUTED_YIELD_ACCOUNT, UNDISTRIBUTED_YIELD_ACCOUNT } from './lib/constants';
 import { $, EvmCheckpoint, TokenHelper } from './lib/utils';
 

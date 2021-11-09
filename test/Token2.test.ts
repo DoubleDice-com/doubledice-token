@@ -1,6 +1,6 @@
 import { expect } from 'chai';
 import { waffle } from 'hardhat';
-import { DoubleDiceToken, DoubleDiceToken__factory } from '../typechain';
+import { DoubleDiceToken, DoubleDiceToken__factory } from '../typechain-types';
 import { $ } from './lib/utils';
 
 const TOTAL_YIELD_AMOUNT = $(37);

@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import { BigNumber, BigNumberish, ContractReceipt, Signer } from 'ethers';
 import { ethers } from 'hardhat';
-import { DoubleDiceToken } from '../../typechain';
+import { DoubleDiceToken } from '../../typechain-types';
 import { zipArrays2, zipArrays3 } from './arrays';
 import { TOKEN_DECIMALS, TOKEN_SYMBOL, UNCLAIMED_DISTRIBUTED_YIELD_ACCOUNT, UNDISTRIBUTED_YIELD_ACCOUNT } from './constants';
 

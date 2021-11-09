@@ -1,7 +1,7 @@
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import { expect } from 'chai';
 import { ethers } from 'hardhat';
-import { DoubleDiceToken, DoubleDiceToken__factory } from '../typechain';
+import { DoubleDiceToken, DoubleDiceToken__factory } from '../typechain-types';
 import {
   TOKEN_DECIMALS,
   TOKEN_NAME,

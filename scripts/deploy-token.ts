@@ -2,7 +2,7 @@ import is from '@sindresorhus/is';
 import assert from 'assert';
 import { BigNumber } from 'ethers';
 import { ethers } from 'hardhat';
-import { DoubleDiceToken__factory } from '../typechain';
+import { DoubleDiceToken__factory } from '../typechain-types';
 import { pressAnyKey } from './utils';
 
 const {
