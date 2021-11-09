@@ -1,5 +1,6 @@
 /* eslint-disable no-undef */
 import '@nomiclabs/hardhat-ethers';
+import '@nomiclabs/hardhat-etherscan';
 import '@nomiclabs/hardhat-waffle';
 import is from '@sindresorhus/is';
 import '@typechain/hardhat';
@@ -18,6 +19,7 @@ if (dotenvResult.error) {
 const {
   PROVIDER_URL,
   OWNER_PRIVATE_KEY,
+  ETHERSCAN_API_KEY,
 } = process.env;
 
 assert(is.string(PROVIDER_URL));
@@ -44,7 +46,9 @@ export default <HardhatUserConfig>{
       chainId: 1,
     },
   },
-
+  etherscan: {
+    apiKey: ETHERSCAN_API_KEY
+  },
   solidity: {
     version: '0.8.6',
     settings: {

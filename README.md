@@ -32,3 +32,11 @@ To run tests with code coverage using [solidity-coverage](https://github.com/sc-
 ```
 npm run coverage
 ```
+
+## Etherscan code-verification
+
+Configure `ETHERSCAN_API_KEY` in `.env` file, then e.g.:
+
+```
+npx hardhat verify --network goerli CONTRACT_ADDRESS CONSTRUCTOR_ARG_1 CONSTRUCTOR_ARG_2 CONSTRUCTOR_ARG_3
+```
