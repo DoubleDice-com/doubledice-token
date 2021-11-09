@@ -12,10 +12,12 @@
     "coverage": "hardhat coverage",
     "test": "npm run cp-local-env && hardhat typechain && hardhat test",
     "run-local-network": "hardhat node",
-    "deploy:token:local": "npm run cp-local-env && npm run clean && hardhat run --network local ./scripts/deploy-token.ts",
+    "clean": "rimraf ./build ./cache ./artifacts ./typechain-types ./abi/*",
+    "predeploy:token:local": "npm run cp-local-env",
+    "deploy:token:local": "  npm run clean && hardhat run --network local   ./scripts/deploy-token.ts",
     "deploy:token:rinkeby": "npm run clean && hardhat run --network rinkeby ./scripts/deploy-token.ts",
-    "deploy:token:mainnet": "npm run clean && hardhat run --network mainnet ./scripts/deploy-token.ts",
-    "clean": "rimraf ./build ./cache ./artifacts ./typechain-types ./abi/*"
+    "deploy:token:goerli": " npm run clean && hardhat run --network goerli  ./scripts/deploy-token.ts",
+    "deploy:token:mainnet": "npm run clean && hardhat run --network mainnet ./scripts/deploy-token.ts"
   },
   "keywords": [],
   "author": "",

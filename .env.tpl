@@ -1,15 +1,18 @@
-NETWORK=
+# Deployment safety-net
+CHAIN_ID=
 
-# Provider URL for deployment
+# For deployment
 PROVIDER_URL=
 
-OWNER=
+MAX_FEE_PER_GAS_IN_GWEI=
+MAX_PRIORITY_FEE_PER_GAS_IN_GWEI=
 
-INIT_TOKEN_HOLDER=
+# Deployer and initial owner()
+OWNER_ADDRESS=
+OWNER_PRIVATE_KEY=
 
+# DoubleDiceToken constructor args.
+# Specify token amounts in DODI, e.g. 1 is interpreted as 1_000000_000000_000000 "wei"
 INIT_TOKEN_SUPPLY=
-
 TOTAL_YIELD_AMOUNT=
-
-# Seed phrase from which accounts used during migration are derived (see account list above)
-MNEMONIC=
+INIT_TOKEN_HOLDER_ADDRESS=

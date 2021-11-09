@@ -1,13 +1,12 @@
-/**
- * @type import('hardhat/config').HardhatUserConfig
- */
-
 /* eslint-disable no-undef */
 import '@nomiclabs/hardhat-ethers';
 import '@nomiclabs/hardhat-waffle';
+import is from '@sindresorhus/is';
 import '@typechain/hardhat';
+import { assert } from 'console';
 import dotenv from 'dotenv';
 import 'hardhat-gas-reporter';
+import { HardhatUserConfig } from 'hardhat/types';
 import 'solidity-coverage';
 
 const dotenvResult = dotenv.config();
@@ -17,35 +16,32 @@ if (dotenvResult.error) {
 }
 
 const {
-  PROVIDER_HOST,
-  PROVIDER_PORT,
   PROVIDER_URL,
-  MNEMONIC,
+  OWNER_PRIVATE_KEY,
 } = process.env;
 
-const GWEI = 1000000000;
+assert(is.string(PROVIDER_URL));
 
-module.exports = {
+export default <HardhatUserConfig>{
   networks: {
     local: {
-      url: `http://${PROVIDER_HOST}:${PROVIDER_PORT}`,
+      url: PROVIDER_URL,
       chainId: 31337,
     },
-
     rinkeby: {
-      url: PROVIDER_URL || '',
-      accounts: { mnemonic: MNEMONIC },
+      url: PROVIDER_URL,
+      accounts: [OWNER_PRIVATE_KEY],
       chainId: 4,
-      gas: 7700000,
-      gasPrice: 1 * GWEI,
     },
-
+    goerli: {
+      url: PROVIDER_URL,
+      accounts: [OWNER_PRIVATE_KEY],
+      chainId: 5,
+    },
     mainnet: {
-      url: PROVIDER_URL || '',
-      accounts: { mnemonic: MNEMONIC },
-      chainId: 4,
-      gas: 7700000,
-      gasPrice: 1 * GWEI,
+      url: PROVIDER_URL,
+      accounts: [OWNER_PRIVATE_KEY],
+      chainId: 1,
     },
   },
 
