@@ -4,8 +4,9 @@ import '@nomiclabs/hardhat-etherscan';
 import '@nomiclabs/hardhat-waffle';
 import is from '@sindresorhus/is';
 import '@typechain/hardhat';
-import { assert } from 'console';
+import assert from 'assert';
 import dotenv from 'dotenv';
+import 'hardhat-abi-exporter';
 import 'hardhat-gas-reporter';
 import { HardhatUserConfig } from 'hardhat/types';
 import 'solidity-coverage';
@@ -58,4 +59,13 @@ export default <HardhatUserConfig>{
       },
     },
   },
+  abiExporter: {
+    clear: true,
+    flat: true,
+    only: [
+      ':DoubleDiceToken$',
+      ':DoubleDiceTokenVesting$',
+      ':DoubleDiceTokenVestingProxyFactory$',
+    ],
+  }
 };
