@@ -90,13 +90,13 @@ contract DoubleDiceToken is
     uint256 constant internal ONE = 1e47;
 
     /// @dev Assumption 1 of 3: Holds true because the contract was created with 10 billion * 1e18 tokens
-    uint256 constant private _ASSUMED_MAX_INIT_TOTAL_SUPPLY = 20e9 * 1e18;
+    uint256 constant internal _ASSUMED_MAX_INIT_TOTAL_SUPPLY = 20e9 * 1e18;
 
     /// @dev Assumption 2 of 3: Holds true because 10 / (10 - 3.7) = 1.5873 <= 2
-    uint256 constant private _ASSUMED_MAX_INIT_TOTAL_TO_INIT_CIRCULATING_SUPPLY_RATIO = 2;
+    uint256 constant internal _ASSUMED_MAX_INIT_TOTAL_TO_INIT_CIRCULATING_SUPPLY_RATIO = 2;
 
     /// @dev Assumption 3 of 3: Holds true because it is `require`-d in `distributeYield()`
-    uint256 constant private _ASSUMED_MIN_TOTAL_CIRCULATING_TO_EXCLUDED_CIRCULATING_SUPPLY_RATIO = 2;
+    uint256 constant internal _ASSUMED_MIN_TOTAL_CIRCULATING_TO_EXCLUDED_CIRCULATING_SUPPLY_RATIO = 2;
 
     function _checkOverflowProtectionAssumptionsConstructor(uint256 initTotalSupply, uint256 totalYieldAmount) internal pure {
         require(initTotalSupply <= _ASSUMED_MAX_INIT_TOTAL_SUPPLY, "Broken assumption");
