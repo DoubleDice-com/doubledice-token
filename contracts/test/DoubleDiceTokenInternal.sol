@@ -30,4 +30,24 @@ contract DoubleDiceTokenInternal is DoubleDiceToken {
         return _entries[account];
     }
 
+    // solhint-disable-next-line func-name-mixedcase
+    function ONE_() external pure returns (uint256) {
+        return ONE;
+    }
+
+    // solhint-disable-next-line func-name-mixedcase
+    function ASSUMED_MAX_INIT_TOTAL_SUPPLY() external pure returns (uint256) {
+        return _ASSUMED_MAX_INIT_TOTAL_SUPPLY;
+    }
+    
+    // solhint-disable-next-line func-name-mixedcase
+    function ASSUMED_MAX_INIT_TOTAL_TO_INIT_CIRCULATING_SUPPLY_RATIO() external pure returns (uint256) {
+        return _ASSUMED_MAX_INIT_TOTAL_TO_INIT_CIRCULATING_SUPPLY_RATIO;
+    }
+    
+    // solhint-disable-next-line func-name-mixedcase
+    function ASSUMED_MIN_TOTAL_CIRCULATING_TO_EXCLUDED_CIRCULATING_SUPPLY_RATIO() external pure returns (uint256) {
+        return _ASSUMED_MIN_TOTAL_CIRCULATING_TO_EXCLUDED_CIRCULATING_SUPPLY_RATIO;
+    }
+
 }
