@@ -41,6 +41,11 @@ export default <HardhatUserConfig>{
       accounts: [OWNER_PRIVATE_KEY],
       chainId: 5,
     },
+    mumbai: {
+      url: PROVIDER_URL,
+      accounts: [OWNER_PRIVATE_KEY],
+      chainId: 80001,
+    },
     mainnet: {
       url: PROVIDER_URL,
       accounts: [OWNER_PRIVATE_KEY],
@@ -64,6 +69,7 @@ export default <HardhatUserConfig>{
     flat: true,
     only: [
       ':DoubleDiceToken$',
+      ':DoubleDiceTokenLocking$',
       ':DoubleDiceTokenVesting$',
       ':DoubleDiceTokenVestingProxyFactory$',
     ],
