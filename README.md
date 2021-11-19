@@ -40,3 +40,9 @@ Configure `ETHERSCAN_API_KEY` in `.env` file, then e.g.:
 ```
 npx hardhat verify --network goerli CONTRACT_ADDRESS CONSTRUCTOR_ARG_1 CONSTRUCTOR_ARG_2 CONSTRUCTOR_ARG_3
 ```
+
+Contract deployed to Ethereum mainnet at `0x4E08F03079c5CD3083eA331Ec61bCC87538B7665` was verified with:
+
+```
+npx hardhat verify --network mainnet 0x4E08F03079c5CD3083eA331Ec61bCC87538B7665 10000000000000000000000000000 3700000000000000000000000000 0x4b64e8187E44810e828A9e97c2FeB01F2e3B8cc6
+```
