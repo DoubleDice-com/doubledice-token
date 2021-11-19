@@ -204,8 +204,8 @@ contract DoubleDiceToken is
     /// @notice Distribute yield to all token holders except `excludedAccounts`
     /// @custom:reverts-with "Ownable: caller is not the owner" if called by an account that is not `owner()`
     /// @custom:reverts-with "Duplicate/unordered account" if `excludedAccounts` contains 0-account,
-    /// @custom:reverts-with "Reserved account" if `excludedAccounts` contains `UNDISTRIBUTED_YIELD_ACCOUNT` or `UNCLAIMED_DISTRIBUTED_YIELD_ACCOUNT`,
-    /// is not in ascending order, or contains duplicate addresses.
+    /// is not in ascending order, or contains duplicate addresses
+    /// @custom:reverts-with "Reserved account" if `excludedAccounts` contains `UNDISTRIBUTED_YIELD_ACCOUNT` or `UNCLAIMED_DISTRIBUTED_YIELD_ACCOUNT`
     /// @custom:reverts-with "Broken assumption" if the total `balancePlusUnclaimedYieldOf` for all `excludedAccounts`
     /// exceeds half the circulating supply (which is `totalSupply() - balanceOf(UNDISTRIBUTED_YIELD_ACCOUNT)`).
     /// @custom:emits-event UnclaimedYieldIncrease if operation results in an increase in `capturedUnclaimedYield`
