@@ -66,6 +66,12 @@
         "internalType": "uint256",
         "name": "expiryTime",
         "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "bool",
+        "name": "isVested",
+        "type": "bool"
       }
     ],
     "name": "Lock",
@@ -318,6 +324,11 @@
       {
         "components": [
           {
+            "internalType": "bytes32",
+            "name": "lockId",
+            "type": "bytes32"
+          },
+          {
             "internalType": "uint256",
             "name": "initialAmount",
             "type": "uint256"
@@ -529,6 +540,11 @@
     ],
     "name": "userInfo",
     "outputs": [
+      {
+        "internalType": "bytes32",
+        "name": "lockId",
+        "type": "bytes32"
+      },
       {
         "internalType": "uint256",
         "name": "initialAmount",

@@ -44,7 +44,7 @@ contract DoubleDiceTokenLocking is Ownable {
         uint256 amount,
         uint256 startTime,
         uint256 expiryTime,
-        bool    vested
+        bool    isVested
     );    
     
     event TopupVestingBasedLock(
