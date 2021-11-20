@@ -2,7 +2,7 @@ import is from '@sindresorhus/is';
 import assert from 'assert';
 import { ethers } from 'hardhat';
 import { formatToken, parseTokenAmount } from '../test/lib/utils';
-import { DoubleDiceToken__factory } from '../typechain-types';
+import { DummyToken__factory as DoubleDiceToken__factory } from '../typechain-types';
 import { pressAnyKey } from './utils';
 
 const {

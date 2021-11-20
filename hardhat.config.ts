@@ -50,12 +50,19 @@ export default <HardhatUserConfig>{
     apiKey: ETHERSCAN_API_KEY
   },
   solidity: {
-    version: '0.8.6',
-    settings: {
-      optimizer: {
-        enabled: true,
-        runs: 200,
+    compilers: [
+      {
+        version: '0.8.6',
+        settings: {
+          optimizer: {
+            enabled: true,
+            runs: 200,
+          },
+        },
       },
-    },
+      {
+        version: '0.6.6'
+      }
+    ]
   },
 };
