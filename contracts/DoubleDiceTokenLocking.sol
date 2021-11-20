@@ -22,6 +22,7 @@ contract DoubleDiceTokenLocking is Ownable {
     }
 
     struct UserInfo {
+        bytes32 lockId;
         uint256 initialAmount;
         uint256 updatedAmount;
         bool    isWhitelisted; 
@@ -42,7 +43,8 @@ contract DoubleDiceTokenLocking is Ownable {
         address indexed beneficiary, 
         uint256 amount,
         uint256 startTime,
-        uint256 expiryTime
+        uint256 expiryTime,
+        bool    vested
     );    
     
     event TopupVestingBasedLock(
@@ -91,7 +93,7 @@ contract DoubleDiceTokenLocking is Ownable {
             claimed: false
         });
         token.transferFrom(msg.sender, address(this), amount);
-        emit Lock(nextLockId, msg.sender, amount, block.timestamp, expiryTime);
+        emit Lock(nextLockId, msg.sender, amount, block.timestamp, expiryTime, false);
         
     }
 
@@ -106,6 +108,7 @@ contract DoubleDiceTokenLocking is Ownable {
         bytes32 nextLockId = keccak256(abi.encode(amount, expiryTime, msg.sender, block.timestamp));
         require(addressLockId[nextLockId] == address(0), "User with this lock id already created");
         
+        userInfo[msg.sender].lockId = nextLockId;
         userInfo[msg.sender].hasReservedLock = true;
         addressLockId[nextLockId] = msg.sender;
             
@@ -126,13 +129,15 @@ contract DoubleDiceTokenLocking is Ownable {
            msg.sender, 
            amount, 
            block.timestamp, 
-           expiryTime
+           expiryTime,
+           true
        );
         
     }
 
     function topupVestingBasedLock(bytes32 lockId, uint256 amount) external onlyLockOwner(lockId) {
         UserInfo storage _userInfo = userInfo[msg.sender];
+        require(_userInfo.lockId == lockId, "Invalid Lock id");
         require(_userInfo.hasReservedLock, "Sender does not have a reserved lock");
         require((MAX_LOCK_AMOUNT_TOPUP_MULTIPLIER * _userInfo.initialAmount) >= (_userInfo.updatedAmount + amount), "Amount exceed the reserved amount");
 
