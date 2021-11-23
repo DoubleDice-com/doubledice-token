@@ -70,6 +70,7 @@ contract DoubleDiceTokenLocking is Ownable {
         uint256 minLockAmount_
     ) {
         require(tokenAddress != address(0), "Not a valid token address");
+        require(minLockAmount_ != 0, "Minimum lock amount must not be equal to zero");
         token = IERC20(tokenAddress);
         minLockAmount = minLockAmount_;
     }
@@ -192,18 +193,21 @@ contract DoubleDiceTokenLocking is Ownable {
     }
     
     function addToWhiteList(address user) external onlyOwner {
+        require(!userInfo[user].isWhitelisted, "User already whitelisted");
         userInfo[user].isWhitelisted = true;
     }    
 
     function updateMinLockDuration(uint256 newLockDuration) external onlyOwner {
+        require(newLockDuration != 0, "New lock duration can not be equal to zero");
         minLockDuration = newLockDuration;
     }
 
     function updateMinLockAmount(uint256 newMinLockAmount) external onlyOwner {
+        require(newMinLockAmount != 0, "New lock amount can not be equal to zero");
         minLockAmount = newMinLockAmount;
     }
 
-    function getlockIdOwnerss(bytes32 lockId) external view returns(address) {
+    function getlockIdOwners(bytes32 lockId) external view returns(address) {
         return lockIdOwners[lockId];
     }
 

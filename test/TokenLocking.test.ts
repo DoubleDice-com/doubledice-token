@@ -182,7 +182,7 @@ describe('DoubleDiceTokenLocking', () => {
 
       if (event) {
         const lockId = event.args?.['lockId'];
-        expect((await tokenLocking.connect(tokenHolder).getlockIdOwnerss(lockId)).toString()).to.eq(tokenHolder.address);
+        expect((await tokenLocking.connect(tokenHolder).getlockIdOwners(lockId)).toString()).to.eq(tokenHolder.address);
 
       }
 
@@ -471,7 +471,7 @@ describe('DoubleDiceTokenLocking', () => {
       if (event) {
         const lockId = event.args?.['lockId'];
         expect(
-          await tokenLocking.connect(USER1).getlockIdOwnerss(lockId)
+          await tokenLocking.connect(USER1).getlockIdOwners(lockId)
         ).to.eq(USER1.address);
 
       }
@@ -741,10 +741,10 @@ describe('DoubleDiceTokenLocking', () => {
       await tokenLocking.deployed();
       await token.connect(tokenHolder).approve(tokenLocking.address, TOTAL_YIELD_AMOUNT.toString());
 
-      const newTimeStamp = (await currentBlockTime()) + 2;
+      const newTimeStamp = (await currentBlockTime()) + 3;
       const tokenAmount = $(1_000);
 
-      await tokenLocking.connect(tokenLockingDeployer).updateMinLockDuration(0);
+      (await await tokenLocking.connect(tokenLockingDeployer).updateMinLockDuration(1)).wait();
 
       const result = await tokenLocking.connect(tokenHolder).createLock(tokenAmount, newTimeStamp);
       const contractReceipt = await result.wait();
@@ -775,12 +775,12 @@ describe('DoubleDiceTokenLocking', () => {
       await tokenLocking.deployed();
       await token.connect(tokenHolder).approve(tokenLocking.address, TOTAL_YIELD_AMOUNT.toString());
 
-      const newTimeStamp = (await currentBlockTime()) + 2;
+      const newTimeStamp = (await currentBlockTime()) + 3;
       const tokenAmount = $(1_000);
       const ownerBalance = await token.balanceOf(tokenHolder.address);
       const newBalance = ownerBalance.sub(tokenAmount);
 
-      await tokenLocking.connect(tokenLockingDeployer).updateMinLockDuration(0);
+      await (await tokenLocking.connect(tokenLockingDeployer).updateMinLockDuration(1)).wait();
 
       const result = await tokenLocking.connect(tokenHolder).createLock(tokenAmount, newTimeStamp);
       const contractReceipt = await result.wait();
@@ -858,10 +858,10 @@ describe('DoubleDiceTokenLocking', () => {
       await token.connect(tokenHolder).approve(tokenLocking.address, TOTAL_YIELD_AMOUNT.toString());
 
       const expiryTime = Math.floor((new Date().setDate(new Date().getDate() + 91)) / 1000);
-      const newTimeStamp = (await currentBlockTime()) + 2;
+      const newTimeStamp = (await currentBlockTime()) + 3;
       const tokenAmount = $(1_000);
 
-      await tokenLocking.connect(tokenLockingDeployer).updateMinLockDuration(0);
+      await (await tokenLocking.connect(tokenLockingDeployer).updateMinLockDuration(1)).wait();
       const result = await tokenLocking.connect(tokenHolder).createLock(tokenAmount, newTimeStamp);
       const contractReceipt = await result.wait();
       const event = contractReceipt.events?.find(event => event.event === 'Lock');

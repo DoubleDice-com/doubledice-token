@@ -327,7 +327,7 @@
         "type": "bytes32"
       }
     ],
-    "name": "getlockIdOwnerss",
+    "name": "getlockIdOwners",
     "outputs": [
       {
         "internalType": "address",
