@@ -182,7 +182,7 @@ describe('DoubleDiceTokenLocking', () => {
 
       if (event) {
         const lockId = event.args?.['lockId'];
-        expect((await tokenLocking.connect(tokenHolder).getAddressLockIds(lockId)).toString()).to.eq(tokenHolder.address);
+        expect((await tokenLocking.connect(tokenHolder).getlockIdOwnerss(lockId)).toString()).to.eq(tokenHolder.address);
 
       }
 
@@ -443,7 +443,7 @@ describe('DoubleDiceTokenLocking', () => {
 
     });
 
-    it('Should check if addressLockId is correct', async () => {
+    it('Should check if lockIdOwners is correct', async () => {
       token = await new DoubleDiceToken__factory(tokenOwner).deploy(
         TOTAL_SUPPLY,
         TOTAL_YIELD_AMOUNT,
@@ -471,7 +471,7 @@ describe('DoubleDiceTokenLocking', () => {
       if (event) {
         const lockId = event.args?.['lockId'];
         expect(
-          await tokenLocking.connect(USER1).getAddressLockIds(lockId)
+          await tokenLocking.connect(USER1).getlockIdOwnerss(lockId)
         ).to.eq(USER1.address);
 
       }

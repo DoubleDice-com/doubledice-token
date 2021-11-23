@@ -31,7 +31,7 @@ contract DoubleDiceTokenLocking is Ownable {
 
     mapping(address => mapping(bytes32 => LockedAsset)) public lockedAsset;
     mapping(address => UserInfo) public userInfo;
-    mapping(bytes32 => address) public addressLockId;
+    mapping(bytes32 => address) public lockIdOwners;
     
     event Claim(
         bytes32 indexed lockId, 
@@ -82,9 +82,9 @@ contract DoubleDiceTokenLocking is Ownable {
         
         bytes32 nextLockId = keccak256(abi.encode(amount, expiryTime, msg.sender, block.timestamp));
 
-        require(addressLockId[nextLockId] == address(0), "User with this lock id already created");
+        require(lockIdOwners[nextLockId] == address(0), "User with this lock id already created");
         
-        addressLockId[nextLockId] = msg.sender;
+        lockIdOwners[nextLockId] = msg.sender;
 
         lockedAsset[msg.sender][nextLockId] = LockedAsset({
             amount: amount,
@@ -106,11 +106,11 @@ contract DoubleDiceTokenLocking is Ownable {
         require(!userInfo[msg.sender].hasReservedLock, "Sender already have a reserved lock");
 
         bytes32 nextLockId = keccak256(abi.encode(amount, expiryTime, msg.sender, block.timestamp));
-        require(addressLockId[nextLockId] == address(0), "User with this lock id already created");
+        require(lockIdOwners[nextLockId] == address(0), "User with this lock id already created");
         
         userInfo[msg.sender].lockId = nextLockId;
         userInfo[msg.sender].hasReservedLock = true;
-        addressLockId[nextLockId] = msg.sender;
+        lockIdOwners[nextLockId] = msg.sender;
             
         userInfo[msg.sender].initialAmount = amount;
         userInfo[msg.sender].updatedAmount = amount;
@@ -203,8 +203,8 @@ contract DoubleDiceTokenLocking is Ownable {
         minLockAmount = newMinLockAmount;
     }
 
-    function getAddressLockIds(bytes32 lockId) external view returns(address) {
-        return addressLockId[lockId];
+    function getlockIdOwnerss(bytes32 lockId) external view returns(address) {
+        return lockIdOwners[lockId];
     }
 
     function getLockDetails(address user, bytes32 lockId) external view returns(LockedAsset memory) {
