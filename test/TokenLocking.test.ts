@@ -607,6 +607,44 @@ describe('DoubleDiceTokenLocking', () => {
 
     });
 
+    it('Should not work with invalid lock id', async () => {
+      token = await new DoubleDiceToken__factory(tokenOwner).deploy(
+        TOTAL_SUPPLY,
+        TOTAL_YIELD_AMOUNT,
+        tokenHolder.address
+      );
+      await token.deployed();
+
+      tokenLocking = await new DoubleDiceTokenLocking__factory(tokenLockingDeployer).deploy(
+        token.address,
+        MINIMIUM_LOCK_AMOUNT
+      );
+      await tokenLocking.deployed();
+
+      await token.connect(tokenHolder).transfer(USER1.address, TOTAL_YIELD_AMOUNT);
+      await token.connect(USER1).approve(tokenLocking.address, TOTAL_YIELD_AMOUNT);
+
+      const expiryTime = Math.floor((new Date().setDate(new Date().getDate() + 91)) / 1000);
+      const amount = $(1_000);
+
+      await tokenLocking.connect(tokenLockingDeployer).addToWhiteList(USER1.address);
+
+      const result = await tokenLocking.connect(USER1).createLock($(1_000), expiryTime);
+      const contractReceipt = await result.wait();
+
+      await tokenLocking.connect(USER1).createVestingBasedLock($(1_000), expiryTime);
+
+      const events = contractReceipt.events?.find(event => event.event === 'Lock');
+
+      if (events) {
+        const lockId = events.args?.['lockId'];
+
+        await expect(
+          tokenLocking.connect(USER1).topupVestingBasedLock(lockId, amount)
+        ).to.be.revertedWith('Invalid Lock id');
+      }
+    });
+
     it('Should if updating reserveLock succeeds', async () => {
       token = await new DoubleDiceToken__factory(tokenOwner).deploy(
         TOTAL_SUPPLY,
