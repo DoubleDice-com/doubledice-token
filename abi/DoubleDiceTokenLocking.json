@@ -108,7 +108,7 @@
       {
         "indexed": true,
         "internalType": "address",
-        "name": "sender",
+        "name": "beneficiary",
         "type": "address"
       },
       {
@@ -133,7 +133,7 @@
       {
         "indexed": true,
         "internalType": "address",
-        "name": "sender",
+        "name": "beneficiary",
         "type": "address"
       },
       {

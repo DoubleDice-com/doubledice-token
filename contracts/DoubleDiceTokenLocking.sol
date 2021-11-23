@@ -49,13 +49,13 @@ contract DoubleDiceTokenLocking is Ownable {
     
     event TopupVestingBasedLock(
         bytes32 indexed lockId, 
-        address indexed sender, 
+        address indexed beneficiary, 
         uint256 amount
     );    
     
     event UpdateLockExpiry(
         bytes32 indexed lockId, 
-        address indexed sender, 
+        address indexed beneficiary, 
         uint256 oldExpiryTime,
         uint256 newExpiryTime
     );
