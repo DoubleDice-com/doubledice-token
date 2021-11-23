@@ -281,7 +281,7 @@
         "type": "address"
       }
     ],
-    "name": "getUserInfo",
+    "name": "getUserVestedBaseLockInfo",
     "outputs": [
       {
         "components": [
@@ -311,7 +311,7 @@
             "type": "bool"
           }
         ],
-        "internalType": "struct DoubleDiceTokenLocking.UserInfo",
+        "internalType": "struct DoubleDiceTokenLocking.UserVestedBaseLockInfo",
         "name": "",
         "type": "tuple"
       }
@@ -538,7 +538,7 @@
         "type": "address"
       }
     ],
-    "name": "userInfo",
+    "name": "userVestedBaseLockInfo",
     "outputs": [
       {
         "internalType": "bytes32",

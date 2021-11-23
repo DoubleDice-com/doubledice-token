@@ -424,21 +424,21 @@ describe('DoubleDiceTokenLocking', () => {
       await tokenLocking.connect(tokenLockingDeployer).addToWhiteList(USER1.address);
 
       expect(
-        (await tokenLocking.connect(USER1).getUserInfo(USER1.address)).hasReservedLock
+        (await tokenLocking.connect(USER1).getUserVestedBaseLockInfo(USER1.address)).hasReservedLock
       ).to.eq(false);
 
       await tokenLocking.connect(USER1).createVestingBasedLock(amount, expiryTime);
 
       expect(
-        (await tokenLocking.connect(USER1).getUserInfo(USER1.address)).hasReservedLock
+        (await tokenLocking.connect(USER1).getUserVestedBaseLockInfo(USER1.address)).hasReservedLock
       ).to.eq(true);
 
       expect(
-        (await tokenLocking.connect(USER1).getUserInfo(USER1.address)).initialAmount
+        (await tokenLocking.connect(USER1).getUserVestedBaseLockInfo(USER1.address)).initialAmount
       ).to.eq(amount.toString());
 
       expect(
-        (await tokenLocking.connect(USER1).getUserInfo(USER1.address)).updatedAmount
+        (await tokenLocking.connect(USER1).getUserVestedBaseLockInfo(USER1.address)).updatedAmount
       ).to.eq(amount.toString());
 
     });
@@ -638,12 +638,12 @@ describe('DoubleDiceTokenLocking', () => {
 
         await tokenLocking.connect(USER1).topupVestingBasedLock(lockId, amount);
 
-        const userInfo = await tokenLocking.connect(USER1).getUserInfo(USER1.address);
+        const userVestedBaseLockInfo = await tokenLocking.connect(USER1).getUserVestedBaseLockInfo(USER1.address);
         const lockDetails = await tokenLocking.connect(USER1).getLockDetails(USER1.address, lockId);
 
         const totalAmount = amount.add($(1_000));
 
-        expect(userInfo.updatedAmount).to.eq(totalAmount);
+        expect(userVestedBaseLockInfo.updatedAmount).to.eq(totalAmount);
         expect(lockDetails.amount).to.eq(totalAmount);
 
         expect(await tokenLocking.connect(USER1).topupVestingBasedLock(lockId, amount))

@@ -21,7 +21,7 @@ contract DoubleDiceTokenLocking is Ownable {
         bool    claimed;
     }
 
-    struct UserInfo {
+    struct UserVestedBaseLockInfo {
         bytes32 lockId;
         uint256 initialAmount;
         uint256 updatedAmount;
@@ -30,7 +30,7 @@ contract DoubleDiceTokenLocking is Ownable {
     }
 
     mapping(address => mapping(bytes32 => LockedAsset)) public lockedAsset;
-    mapping(address => UserInfo) public userInfo;
+    mapping(address => UserVestedBaseLockInfo) public userVestedBaseLockInfo;
     mapping(bytes32 => address) public lockIdOwners;
     
     event Claim(
@@ -103,18 +103,18 @@ contract DoubleDiceTokenLocking is Ownable {
         require(expiryTime != 0, "Expiry must not be equal to zero");
         require(expiryTime >= (block.timestamp + minLockDuration), "Expiry time is too low");
         require(amount >= minLockAmount, "Token amount is too low");
-        require(userInfo[msg.sender].isWhitelisted, "Sender is not whitelisted");
-        require(!userInfo[msg.sender].hasReservedLock, "Sender already have a reserved lock");
+        require(userVestedBaseLockInfo[msg.sender].isWhitelisted, "Sender is not whitelisted");
+        require(!userVestedBaseLockInfo[msg.sender].hasReservedLock, "Sender already have a reserved lock");
 
         bytes32 nextLockId = keccak256(abi.encode(amount, expiryTime, msg.sender, block.timestamp));
         require(lockIdOwners[nextLockId] == address(0), "User with this lock id already created");
         
-        userInfo[msg.sender].lockId = nextLockId;
-        userInfo[msg.sender].hasReservedLock = true;
+        userVestedBaseLockInfo[msg.sender].lockId = nextLockId;
+        userVestedBaseLockInfo[msg.sender].hasReservedLock = true;
         lockIdOwners[nextLockId] = msg.sender;
             
-        userInfo[msg.sender].initialAmount = amount;
-        userInfo[msg.sender].updatedAmount = amount;
+        userVestedBaseLockInfo[msg.sender].initialAmount = amount;
+        userVestedBaseLockInfo[msg.sender].updatedAmount = amount;
 
         lockedAsset[msg.sender][nextLockId] = LockedAsset({
             amount: amount,
@@ -137,12 +137,12 @@ contract DoubleDiceTokenLocking is Ownable {
     }
 
     function topupVestingBasedLock(bytes32 lockId, uint256 amount) external onlyLockOwner(lockId) {
-        UserInfo storage _userInfo = userInfo[msg.sender];
-        require(_userInfo.lockId == lockId, "Invalid Lock id");
-        require(_userInfo.hasReservedLock, "Sender does not have a reserved lock");
-        require((MAX_LOCK_AMOUNT_TOPUP_MULTIPLIER * _userInfo.initialAmount) >= (_userInfo.updatedAmount + amount), "Amount exceed the reserved amount");
+        UserVestedBaseLockInfo storage _userVestedBaseLockInfo = userVestedBaseLockInfo[msg.sender];
+        require(_userVestedBaseLockInfo.lockId == lockId, "Invalid Lock id");
+        require(_userVestedBaseLockInfo.hasReservedLock, "Sender does not have a reserved lock");
+        require((MAX_LOCK_AMOUNT_TOPUP_MULTIPLIER * _userVestedBaseLockInfo.initialAmount) >= (_userVestedBaseLockInfo.updatedAmount + amount), "Amount exceed the reserved amount");
 
-       _userInfo.updatedAmount = _userInfo.updatedAmount + amount;
+       _userVestedBaseLockInfo.updatedAmount = _userVestedBaseLockInfo.updatedAmount + amount;
        lockedAsset[msg.sender][lockId].amount = lockedAsset[msg.sender][lockId].amount + amount;
 
        token.transferFrom(msg.sender, address(this), amount);
@@ -193,8 +193,8 @@ contract DoubleDiceTokenLocking is Ownable {
     }
     
     function addToWhiteList(address user) external onlyOwner {
-        require(!userInfo[user].isWhitelisted, "User already whitelisted");
-        userInfo[user].isWhitelisted = true;
+        require(!userVestedBaseLockInfo[user].isWhitelisted, "User already whitelisted");
+        userVestedBaseLockInfo[user].isWhitelisted = true;
     }    
 
     function updateMinLockDuration(uint256 newLockDuration) external onlyOwner {
@@ -215,8 +215,8 @@ contract DoubleDiceTokenLocking is Ownable {
         return lockedAsset[user][lockId];
     }
     
-    function getUserInfo(address user) external view returns(UserInfo memory) {
-        return userInfo[user];
+    function getUserVestedBaseLockInfo(address user) external view returns(UserVestedBaseLockInfo memory) {
+        return userVestedBaseLockInfo[user];
     }
     
     
