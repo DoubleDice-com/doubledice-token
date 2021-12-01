@@ -1,4 +1,4 @@
-# DODI Token
+# DoubleDice $DODI Token
 
 ## Overview
 
@@ -134,7 +134,7 @@ Let:
 
 - Let `ε_max` be a parameter controlling the maximum proportion of the circulating supply that can be excluded from receiving yield in every `distributeYield` round
 
-Then it can be proven (see [Theoretical upper-bound on `f`](#theoretical-upper-bound-on-f)) that the value of `f` after an infinite number of calls to `distributeYield` will satisfy the follow inequality:
+Then [it can be proven](./docs/upper-bound-derivation.pdf) that the value of `f` after an infinite number of calls to `distributeYield` will satisfy the follow inequality:
 
 ![upper-bound](./docs/upper-bound.png)
 
@@ -164,8 +164,7 @@ _factor = ((ONE + _factor) * includedCirculatingSupplyAfter) / includedCirculati
 
 Since integer division rounds _down_, after an infinite number of `distributeYield`s, the value of `_factor` might end up being _smaller_ than it should be in theory, but never larger. Hence there is no concern that rounding-errors may lead to this computation exceeding its proven theoretical upper-bound.
 
-#### Theoretical upper-bound on `f`
+# Other documentation
 
-![upper-bound-derivation](./docs/upper-bound-derivation.png)
-
-Note: `d_i` is the amount of yield distributed during the `i`<sup>th</sup> yield-distribution.
+- [DoubleDiceTokenVesting contract](./docs/OTHER.md)
+- [DoubleDiceTokenVestingProxy contract](./docs/EN-05.md)
