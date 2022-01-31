@@ -16,6 +16,7 @@ contract DoubleDiceUserTokenLocking is Ownable, ReentrancyGuard {
 
   struct UserLock {
     uint256 amount;
+    uint256 startTime;
     uint256 expiryTime;
     bool    hasLock;
     bool    claimed;
@@ -31,6 +32,7 @@ contract DoubleDiceUserTokenLocking is Ownable, ReentrancyGuard {
   event UserLockInfo(
     address indexed user, 
     uint256 amount,
+    uint256 startTime,
     uint256 expiryTime
   );    
   
@@ -55,13 +57,14 @@ contract DoubleDiceUserTokenLocking is Ownable, ReentrancyGuard {
   }
 
   function createLock(uint256 amount, uint256 expiryTime) external {
-    require(expiryTime != 0, "Expiry must not be equal to zero");
+    require(expiryTime != 0, "Expiry can not be equal to zero");
     require(expiryTime >= (block.timestamp + minLockDuration), "Expiry time is too low");
     require(amount >= minLockAmount, "Token amount is too low");
     require(!userLock[msg.sender].hasLock, "User already created a lock");
 
     userLock[msg.sender] = UserLock({
       amount: amount,
+      startTime: block.timestamp,
       expiryTime: expiryTime,
       hasLock: true,
       claimed: false
@@ -69,7 +72,7 @@ contract DoubleDiceUserTokenLocking is Ownable, ReentrancyGuard {
     
     token.transferFrom(msg.sender, address(this), amount);
 
-    emit UserLockInfo(msg.sender, amount, expiryTime);
+    emit UserLockInfo(msg.sender, amount, block.timestamp, expiryTime);
   }
 
 
