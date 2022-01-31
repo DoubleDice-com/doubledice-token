@@ -24,13 +24,9 @@ describe('DoubleDiceTokenLocking', () => {
   const TOTAL_YIELD_AMOUNT = $(4_000_000_000);
   const MINIMIUM_LOCK_AMOUNT = $(1_000);
   const ZERO_ETHER_ADDRESS = '0x0000000000000000000000000000000000000000';
-
-  let days = 91;
-
   const today = new Date();
-  const timestamp = (today.setDate(today.getDate() + days)) / 1000;
-  const expiryTime = Math.floor(timestamp);
 
+ 
   before(async () => {
     [tokenOwner, tokenHolder, tokenLockingDeployer, USER1, USER2] = await ethers.getSigners();
 
@@ -39,7 +35,7 @@ describe('DoubleDiceTokenLocking', () => {
       TOTAL_YIELD_AMOUNT,
       tokenHolder.address
     );
-    await token.deployed();
+    
 
   });
 
@@ -59,12 +55,12 @@ describe('DoubleDiceTokenLocking', () => {
         TOTAL_YIELD_AMOUNT,
         tokenHolder.address
       );
-      await token.deployed();
+      
       tokenLocking = await new DoubleDiceUserTokenLocking__factory(tokenLockingDeployer).deploy(
         token.address,
         MINIMIUM_LOCK_AMOUNT
       );
-      await tokenLocking.deployed();
+      
       await token.connect(tokenHolder).approve(tokenLocking.address, MINIMIUM_LOCK_AMOUNT.toString());
 
       expect(await tokenLocking.token()).to.eq(token.address);
@@ -76,12 +72,12 @@ describe('DoubleDiceTokenLocking', () => {
         TOTAL_YIELD_AMOUNT,
         tokenHolder.address
       );
-      await token.deployed();
+      
       tokenLocking = await new DoubleDiceUserTokenLocking__factory(tokenLockingDeployer).deploy(
         token.address,
         MINIMIUM_LOCK_AMOUNT
       );
-      await tokenLocking.deployed();
+      
       await token.connect(tokenHolder).approve(tokenLocking.address, MINIMIUM_LOCK_AMOUNT.toString());
 
       expect(await tokenLocking.minLockAmount()).to.eq(MINIMIUM_LOCK_AMOUNT);
@@ -98,13 +94,13 @@ describe('DoubleDiceTokenLocking', () => {
         TOTAL_YIELD_AMOUNT,
         tokenHolder.address
       );
-      await token.deployed();
+      
 
       tokenLocking = await new DoubleDiceUserTokenLocking__factory(tokenLockingDeployer).deploy(
         token.address,
         MINIMIUM_LOCK_AMOUNT
       );
-      await tokenLocking.deployed();
+      
       await token.connect(tokenHolder).approve(tokenLocking.address, MINIMIUM_LOCK_AMOUNT.toString());
 
       await expect(
@@ -119,13 +115,13 @@ describe('DoubleDiceTokenLocking', () => {
         TOTAL_YIELD_AMOUNT,
         tokenHolder.address
       );
-      await token.deployed();
+      
 
       tokenLocking = await new DoubleDiceUserTokenLocking__factory(tokenLockingDeployer).deploy(
         token.address,
         MINIMIUM_LOCK_AMOUNT
       );
-      await tokenLocking.deployed();
+      
       await token.connect(tokenHolder).approve(tokenLocking.address, MINIMIUM_LOCK_AMOUNT.toString());
 
       const expiryTime = Math.floor((new Date().setDate(new Date().getDate() + 30)) / 1000);
@@ -142,17 +138,15 @@ describe('DoubleDiceTokenLocking', () => {
         TOTAL_YIELD_AMOUNT,
         tokenHolder.address
       );
-      await token.deployed();
 
       tokenLocking = await new DoubleDiceUserTokenLocking__factory(tokenLockingDeployer).deploy(
         token.address,
         MINIMIUM_LOCK_AMOUNT
       );
-      await tokenLocking.deployed();
 
       await token.connect(tokenHolder).approve(tokenLocking.address, MINIMIUM_LOCK_AMOUNT.toString());
 
-      const timestamp = (today.setDate(today.getDate() + 365)) / 1000;
+      const timestamp = (today.setDate(today.getDate() + 366)) / 1000;
       const expiryTime = Math.floor(timestamp);
 
       await expect(
@@ -167,13 +161,11 @@ describe('DoubleDiceTokenLocking', () => {
         TOTAL_YIELD_AMOUNT,
         tokenHolder.address
       );
-      await token.deployed();
 
       tokenLocking = await new DoubleDiceUserTokenLocking__factory(tokenLockingDeployer).deploy(
         token.address,
         MINIMIUM_LOCK_AMOUNT
       );
-      await tokenLocking.deployed();
 
       await token.connect(tokenHolder).approve(tokenLocking.address, MINIMIUM_LOCK_AMOUNT.toString());
 
@@ -232,13 +224,13 @@ describe('DoubleDiceTokenLocking', () => {
         TOTAL_YIELD_AMOUNT,
         tokenHolder.address
       );
-      await token.deployed();
+      
 
       tokenLocking = await new DoubleDiceUserTokenLocking__factory(tokenLockingDeployer).deploy(
         token.address,
         MINIMIUM_LOCK_AMOUNT
       );
-      await tokenLocking.deployed();
+      
 
       await token.connect(tokenHolder).approve(tokenLocking.address, TOTAL_YIELD_AMOUNT.toString());
       const tokenAmount = $(1_000);
@@ -258,13 +250,13 @@ describe('DoubleDiceTokenLocking', () => {
         TOTAL_YIELD_AMOUNT,
         tokenHolder.address
       );
-      await token.deployed();
+      
 
       tokenLocking = await new DoubleDiceUserTokenLocking__factory(tokenLockingDeployer).deploy(
         token.address,
         MINIMIUM_LOCK_AMOUNT
       );
-      await tokenLocking.deployed();
+      
 
       await token.connect(tokenHolder).transfer(USER1.address, $(3_000));
       await token.connect(USER1).approve(tokenLocking.address, $(3_000));
@@ -303,13 +295,13 @@ describe('DoubleDiceTokenLocking', () => {
         TOTAL_YIELD_AMOUNT,
         tokenHolder.address
       );
-      await token.deployed();
+      
 
       tokenLocking = await new DoubleDiceUserTokenLocking__factory(tokenLockingDeployer).deploy(
         token.address,
         MINIMIUM_LOCK_AMOUNT
       );
-      await tokenLocking.deployed();
+      
       await token.connect(tokenHolder).approve(tokenLocking.address, MINIMIUM_LOCK_AMOUNT.toString());
 
       const timestamp = (today.setDate(today.getDate() + 365)) / 1000;
@@ -329,13 +321,13 @@ describe('DoubleDiceTokenLocking', () => {
         TOTAL_YIELD_AMOUNT,
         tokenHolder.address
       );
-      await token.deployed();
+      
 
       tokenLocking = await new DoubleDiceUserTokenLocking__factory(tokenLockingDeployer).deploy(
         token.address,
         MINIMIUM_LOCK_AMOUNT
       );
-      await tokenLocking.deployed();
+      
       await token.connect(tokenHolder).approve(tokenLocking.address, TOTAL_YIELD_AMOUNT.toString());
 
       const newTimeStamp = (await currentBlockTime()) + 3;
@@ -358,13 +350,13 @@ describe('DoubleDiceTokenLocking', () => {
         TOTAL_YIELD_AMOUNT,
         tokenHolder.address
       );
-      await token.deployed();
+      
 
       tokenLocking = await new DoubleDiceUserTokenLocking__factory(tokenLockingDeployer).deploy(
         token.address,
         MINIMIUM_LOCK_AMOUNT
       );
-      await tokenLocking.deployed();
+      
       await token.connect(tokenHolder).approve(tokenLocking.address, TOTAL_YIELD_AMOUNT.toString());
 
       const newTimeStamp = (await currentBlockTime()) + 3;
@@ -397,13 +389,13 @@ describe('DoubleDiceTokenLocking', () => {
         TOTAL_YIELD_AMOUNT,
         tokenHolder.address
       );
-      await token.deployed();
+      
 
       tokenLocking = await new DoubleDiceUserTokenLocking__factory(tokenLockingDeployer).deploy(
         token.address,
         MINIMIUM_LOCK_AMOUNT
       );
-      await tokenLocking.deployed();
+      
       await token.connect(tokenHolder).approve(tokenLocking.address, TOTAL_YIELD_AMOUNT.toString());
 
       const timestamp = (today.setDate(today.getDate() + 365)) / 1000;
@@ -439,7 +431,6 @@ describe('DoubleDiceTokenLocking', () => {
       );
       await token.connect(tokenHolder).approve(tokenLocking.address, TOTAL_YIELD_AMOUNT.toString());
 
-      const today = new Date();
       let timestamp = (today.setDate(today.getDate() + 366)) / 1000;
       const oldExpiryTime = Math.floor(timestamp);
 
