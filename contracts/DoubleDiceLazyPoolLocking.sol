@@ -5,7 +5,7 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 
-contract DoubleDiceUserTokenLocking is Ownable, ReentrancyGuard {
+contract DoubleDiceLazyPoolLocking is Ownable, ReentrancyGuard {
 
   using SafeERC20 for IERC20;
 
@@ -81,7 +81,7 @@ contract DoubleDiceUserTokenLocking is Ownable, ReentrancyGuard {
     require(amount > 0, "Top up amount must be greater than zero");
     require(user.hasLock, "User have not created a lock");
 
-    user.amount = user.amount + amount;
+    user.amount += amount;
     
     token.transferFrom(msg.sender, address(this), amount);
 

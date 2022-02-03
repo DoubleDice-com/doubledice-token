@@ -3,7 +3,7 @@ import chai, { expect } from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 
 import { ethers } from 'hardhat';
-import { DoubleDiceToken, DoubleDiceUserTokenLocking, DoubleDiceToken__factory, DoubleDiceUserTokenLocking__factory } from '../typechain-types';
+import { DoubleDiceToken, DoubleDiceLazyPoolLocking, DoubleDiceToken__factory, DoubleDiceLazyPoolLocking__factory } from '../typechain-types';
 
 import { $, currentBlockTime } from './lib/utils';
 
@@ -18,7 +18,7 @@ describe('DoubleDiceTokenLocking', () => {
   let USER2: SignerWithAddress;
 
   let token: DoubleDiceToken;
-  let tokenLocking: DoubleDiceUserTokenLocking;
+  let tokenLocking: DoubleDiceLazyPoolLocking;
 
   const TOTAL_SUPPLY = $(10_000_000_000);
   const TOTAL_YIELD_AMOUNT = $(4_000_000_000);
@@ -26,7 +26,7 @@ describe('DoubleDiceTokenLocking', () => {
   const ZERO_ETHER_ADDRESS = '0x0000000000000000000000000000000000000000';
   const today = new Date();
 
- 
+
   before(async () => {
     [tokenOwner, tokenHolder, tokenLockingDeployer, USER1, USER2] = await ethers.getSigners();
 
@@ -35,7 +35,7 @@ describe('DoubleDiceTokenLocking', () => {
       TOTAL_YIELD_AMOUNT,
       tokenHolder.address
     );
-    
+
 
   });
 
@@ -43,7 +43,7 @@ describe('DoubleDiceTokenLocking', () => {
   describe('Contract deployment', () => {
 
     it('Should return error when invalid token address used', async () => {
-      await expect(new DoubleDiceUserTokenLocking__factory(tokenLockingDeployer).deploy(
+      await expect(new DoubleDiceLazyPoolLocking__factory(tokenLockingDeployer).deploy(
         ZERO_ETHER_ADDRESS,
         MINIMIUM_LOCK_AMOUNT
       )).to.be.revertedWith('Not a valid token address');
@@ -55,12 +55,12 @@ describe('DoubleDiceTokenLocking', () => {
         TOTAL_YIELD_AMOUNT,
         tokenHolder.address
       );
-      
-      tokenLocking = await new DoubleDiceUserTokenLocking__factory(tokenLockingDeployer).deploy(
+
+      tokenLocking = await new DoubleDiceLazyPoolLocking__factory(tokenLockingDeployer).deploy(
         token.address,
         MINIMIUM_LOCK_AMOUNT
       );
-      
+
       await token.connect(tokenHolder).approve(tokenLocking.address, MINIMIUM_LOCK_AMOUNT.toString());
 
       expect(await tokenLocking.token()).to.eq(token.address);
@@ -72,12 +72,12 @@ describe('DoubleDiceTokenLocking', () => {
         TOTAL_YIELD_AMOUNT,
         tokenHolder.address
       );
-      
-      tokenLocking = await new DoubleDiceUserTokenLocking__factory(tokenLockingDeployer).deploy(
+
+      tokenLocking = await new DoubleDiceLazyPoolLocking__factory(tokenLockingDeployer).deploy(
         token.address,
         MINIMIUM_LOCK_AMOUNT
       );
-      
+
       await token.connect(tokenHolder).approve(tokenLocking.address, MINIMIUM_LOCK_AMOUNT.toString());
 
       expect(await tokenLocking.minLockAmount()).to.eq(MINIMIUM_LOCK_AMOUNT);
@@ -94,13 +94,13 @@ describe('DoubleDiceTokenLocking', () => {
         TOTAL_YIELD_AMOUNT,
         tokenHolder.address
       );
-      
 
-      tokenLocking = await new DoubleDiceUserTokenLocking__factory(tokenLockingDeployer).deploy(
+
+      tokenLocking = await new DoubleDiceLazyPoolLocking__factory(tokenLockingDeployer).deploy(
         token.address,
         MINIMIUM_LOCK_AMOUNT
       );
-      
+
       await token.connect(tokenHolder).approve(tokenLocking.address, MINIMIUM_LOCK_AMOUNT.toString());
 
       await expect(
@@ -115,13 +115,13 @@ describe('DoubleDiceTokenLocking', () => {
         TOTAL_YIELD_AMOUNT,
         tokenHolder.address
       );
-      
 
-      tokenLocking = await new DoubleDiceUserTokenLocking__factory(tokenLockingDeployer).deploy(
+
+      tokenLocking = await new DoubleDiceLazyPoolLocking__factory(tokenLockingDeployer).deploy(
         token.address,
         MINIMIUM_LOCK_AMOUNT
       );
-      
+
       await token.connect(tokenHolder).approve(tokenLocking.address, MINIMIUM_LOCK_AMOUNT.toString());
 
       const expiryTime = Math.floor((new Date().setDate(new Date().getDate() + 30)) / 1000);
@@ -139,7 +139,7 @@ describe('DoubleDiceTokenLocking', () => {
         tokenHolder.address
       );
 
-      tokenLocking = await new DoubleDiceUserTokenLocking__factory(tokenLockingDeployer).deploy(
+      tokenLocking = await new DoubleDiceLazyPoolLocking__factory(tokenLockingDeployer).deploy(
         token.address,
         MINIMIUM_LOCK_AMOUNT
       );
@@ -162,7 +162,7 @@ describe('DoubleDiceTokenLocking', () => {
         tokenHolder.address
       );
 
-      tokenLocking = await new DoubleDiceUserTokenLocking__factory(tokenLockingDeployer).deploy(
+      tokenLocking = await new DoubleDiceLazyPoolLocking__factory(tokenLockingDeployer).deploy(
         token.address,
         MINIMIUM_LOCK_AMOUNT
       );
@@ -201,7 +201,7 @@ describe('DoubleDiceTokenLocking', () => {
         USER2.address
       );
 
-      const tokenLocking = await new DoubleDiceUserTokenLocking__factory(tokenLockingDeployer).deploy(
+      const tokenLocking = await new DoubleDiceLazyPoolLocking__factory(tokenLockingDeployer).deploy(
         token.address,
         MINIMIUM_LOCK_AMOUNT
       );
@@ -224,13 +224,13 @@ describe('DoubleDiceTokenLocking', () => {
         TOTAL_YIELD_AMOUNT,
         tokenHolder.address
       );
-      
 
-      tokenLocking = await new DoubleDiceUserTokenLocking__factory(tokenLockingDeployer).deploy(
+
+      tokenLocking = await new DoubleDiceLazyPoolLocking__factory(tokenLockingDeployer).deploy(
         token.address,
         MINIMIUM_LOCK_AMOUNT
       );
-      
+
 
       await token.connect(tokenHolder).approve(tokenLocking.address, TOTAL_YIELD_AMOUNT.toString());
       const tokenAmount = $(1_000);
@@ -250,13 +250,13 @@ describe('DoubleDiceTokenLocking', () => {
         TOTAL_YIELD_AMOUNT,
         tokenHolder.address
       );
-      
 
-      tokenLocking = await new DoubleDiceUserTokenLocking__factory(tokenLockingDeployer).deploy(
+
+      tokenLocking = await new DoubleDiceLazyPoolLocking__factory(tokenLockingDeployer).deploy(
         token.address,
         MINIMIUM_LOCK_AMOUNT
       );
-      
+
 
       await token.connect(tokenHolder).transfer(USER1.address, $(3_000));
       await token.connect(USER1).approve(tokenLocking.address, $(3_000));
@@ -287,6 +287,147 @@ describe('DoubleDiceTokenLocking', () => {
 
   });
 
+  describe('topUpLock', async () => {
+
+    it('Should fail if top up amount is zero', async () => {
+      const token = await new DoubleDiceToken__factory(tokenOwner).deploy(
+        TOTAL_SUPPLY,
+        TOTAL_YIELD_AMOUNT,
+        tokenHolder.address
+      );
+
+      const tokenLocking = await new DoubleDiceLazyPoolLocking__factory(tokenLockingDeployer).deploy(
+        token.address,
+        MINIMIUM_LOCK_AMOUNT
+      );
+
+      const timestamp = (today.setDate(today.getDate() + 365)) / 1000;
+      const expiryTime = Math.floor(timestamp);
+
+      await token.connect(tokenHolder).transfer(USER1.address, $(3_000));
+      await token.connect(USER1).approve(tokenLocking.address, $(3_000));
+
+      await tokenLocking.connect(USER1).createLock($(1_000), expiryTime);
+
+      await expect(
+        tokenLocking.connect(tokenHolder).topUpLock('0')
+      ).to.be.revertedWith('Top up amount must be greater than zero');
+
+    });
+
+    it('Should fail if user have not created a lock', async () => {
+      const token = await new DoubleDiceToken__factory(tokenOwner).deploy(
+        TOTAL_SUPPLY,
+        TOTAL_YIELD_AMOUNT,
+        tokenHolder.address
+      );
+
+      const tokenLocking = await new DoubleDiceLazyPoolLocking__factory(tokenLockingDeployer).deploy(
+        token.address,
+        MINIMIUM_LOCK_AMOUNT
+      );
+
+      await token.connect(tokenHolder).transfer(USER1.address, $(3_000));
+
+      await expect(
+        tokenLocking.connect(tokenHolder).topUpLock($(1_000))
+      ).to.be.revertedWith('User have not created a lock');
+
+    });
+
+    it('Should check succesful top up', async () => {
+      token = await new DoubleDiceToken__factory(tokenOwner).deploy(
+        TOTAL_SUPPLY,
+        TOTAL_YIELD_AMOUNT,
+        tokenHolder.address
+      );
+
+      tokenLocking = await new DoubleDiceLazyPoolLocking__factory(tokenLockingDeployer).deploy(
+        token.address,
+        MINIMIUM_LOCK_AMOUNT
+      );
+
+      const timestamp = (today.setDate(today.getDate() + 365)) / 1000;
+      const expiryTime = Math.floor(timestamp);
+
+      await token.connect(tokenHolder).transfer(USER1.address, $(4_000));
+      await token.connect(USER1).approve(tokenLocking.address, $(4_000));
+
+      await tokenLocking.connect(USER1).createLock($(1_000), expiryTime);
+
+      expect(
+        (await tokenLocking.connect(USER1).getUserLockInfo(USER1.address)).amount
+      ).to.eq($(1_000));
+
+      await tokenLocking.connect(USER1).topUpLock($(1_000));
+
+      expect(
+        (await tokenLocking.connect(USER1).getUserLockInfo(USER1.address)).amount
+      ).to.eq($(2_000));
+
+    });
+
+  });
+
+  describe('updateMinLockAmount', async () => {
+
+    it('Should fail if new amount is zero', async () => {
+      const token = await new DoubleDiceToken__factory(tokenOwner).deploy(
+        TOTAL_SUPPLY,
+        TOTAL_YIELD_AMOUNT,
+        tokenHolder.address
+      );
+
+      const tokenLocking = await new DoubleDiceLazyPoolLocking__factory(tokenLockingDeployer).deploy(
+        token.address,
+        MINIMIUM_LOCK_AMOUNT
+      );
+
+      await expect(
+        tokenLocking.connect(tokenLockingDeployer).updateMinLockAmount('0')
+      ).to.be.revertedWith('New lock amount can not be equal to zero');
+
+    });
+
+    it('Should fail if non owner wants to update minimum lock amount ', async () => {
+      const token = await new DoubleDiceToken__factory(tokenOwner).deploy(
+        TOTAL_SUPPLY,
+        TOTAL_YIELD_AMOUNT,
+        tokenHolder.address
+      );
+
+      const tokenLocking = await new DoubleDiceLazyPoolLocking__factory(tokenLockingDeployer).deploy(
+        token.address,
+        MINIMIUM_LOCK_AMOUNT
+      );
+
+      await expect(
+        tokenLocking.connect(USER1).updateMinLockAmount($(1_000))
+      ).to.be.revertedWith('Ownable: caller is not the owner');
+
+    });
+
+    it('Should check succesful minimum lock update', async () => {
+      token = await new DoubleDiceToken__factory(tokenOwner).deploy(
+        TOTAL_SUPPLY,
+        TOTAL_YIELD_AMOUNT,
+        tokenHolder.address
+      );
+
+      tokenLocking = await new DoubleDiceLazyPoolLocking__factory(tokenLockingDeployer).deploy(
+        token.address,
+        MINIMIUM_LOCK_AMOUNT
+      );
+      expect(await tokenLocking.connect(tokenLockingDeployer).minLockAmount()).to.eq(MINIMIUM_LOCK_AMOUNT);
+
+      await tokenLocking.connect(tokenLockingDeployer).updateMinLockAmount($(3_000));
+
+      expect(await tokenLocking.connect(tokenLockingDeployer).minLockAmount()).to.eq($(3_000));
+
+    });
+
+  });
+
   describe('claim', async () => {
 
     it('should check if claim have expired', async () => {
@@ -295,13 +436,13 @@ describe('DoubleDiceTokenLocking', () => {
         TOTAL_YIELD_AMOUNT,
         tokenHolder.address
       );
-      
 
-      tokenLocking = await new DoubleDiceUserTokenLocking__factory(tokenLockingDeployer).deploy(
+
+      tokenLocking = await new DoubleDiceLazyPoolLocking__factory(tokenLockingDeployer).deploy(
         token.address,
         MINIMIUM_LOCK_AMOUNT
       );
-      
+
       await token.connect(tokenHolder).approve(tokenLocking.address, MINIMIUM_LOCK_AMOUNT.toString());
 
       const timestamp = (today.setDate(today.getDate() + 365)) / 1000;
@@ -321,13 +462,13 @@ describe('DoubleDiceTokenLocking', () => {
         TOTAL_YIELD_AMOUNT,
         tokenHolder.address
       );
-      
 
-      tokenLocking = await new DoubleDiceUserTokenLocking__factory(tokenLockingDeployer).deploy(
+
+      tokenLocking = await new DoubleDiceLazyPoolLocking__factory(tokenLockingDeployer).deploy(
         token.address,
         MINIMIUM_LOCK_AMOUNT
       );
-      
+
       await token.connect(tokenHolder).approve(tokenLocking.address, TOTAL_YIELD_AMOUNT.toString());
 
       const newTimeStamp = (await currentBlockTime()) + 3;
@@ -350,13 +491,13 @@ describe('DoubleDiceTokenLocking', () => {
         TOTAL_YIELD_AMOUNT,
         tokenHolder.address
       );
-      
 
-      tokenLocking = await new DoubleDiceUserTokenLocking__factory(tokenLockingDeployer).deploy(
+
+      tokenLocking = await new DoubleDiceLazyPoolLocking__factory(tokenLockingDeployer).deploy(
         token.address,
         MINIMIUM_LOCK_AMOUNT
       );
-      
+
       await token.connect(tokenHolder).approve(tokenLocking.address, TOTAL_YIELD_AMOUNT.toString());
 
       const newTimeStamp = (await currentBlockTime()) + 3;
@@ -389,13 +530,13 @@ describe('DoubleDiceTokenLocking', () => {
         TOTAL_YIELD_AMOUNT,
         tokenHolder.address
       );
-      
 
-      tokenLocking = await new DoubleDiceUserTokenLocking__factory(tokenLockingDeployer).deploy(
+
+      tokenLocking = await new DoubleDiceLazyPoolLocking__factory(tokenLockingDeployer).deploy(
         token.address,
         MINIMIUM_LOCK_AMOUNT
       );
-      
+
       await token.connect(tokenHolder).approve(tokenLocking.address, TOTAL_YIELD_AMOUNT.toString());
 
       const timestamp = (today.setDate(today.getDate() + 365)) / 1000;
@@ -425,7 +566,7 @@ describe('DoubleDiceTokenLocking', () => {
         tokenHolder.address
       );
 
-      const tokenLocking = await new DoubleDiceUserTokenLocking__factory(tokenLockingDeployer).deploy(
+      const tokenLocking = await new DoubleDiceLazyPoolLocking__factory(tokenLockingDeployer).deploy(
         token.address,
         MINIMIUM_LOCK_AMOUNT
       );
@@ -444,16 +585,19 @@ describe('DoubleDiceTokenLocking', () => {
       const tokenAmount = $(1_000);
 
       await tokenLocking.connect(tokenHolder).createLock(tokenAmount, oldExpiryTime);
-     
+
 
       await tokenLocking.connect(tokenHolder).updateLockExpiry(newExpiryTime1);
 
       const lockDetails = await tokenLocking.connect(tokenHolder).getUserLockInfo(tokenHolder.address);
       expect(lockDetails.expiryTime).to.eq(newExpiryTime1);
+      
+      await tokenLocking.connect(tokenHolder).updateLockExpiry(newExpiryTime2);
 
-      expect(await tokenLocking.connect(tokenHolder).updateLockExpiry(newExpiryTime2))
-        .to.emit(tokenLocking, 'UpdateLockExpiry')
-        .withArgs(tokenHolder.address, oldExpiryTime, newExpiryTime2);
+      expect(
+        (await tokenLocking.connect(tokenHolder).getUserLockInfo(tokenHolder.address)).expiryTime
+      ).to.eq(newExpiryTime2);
+
 
     });
 
