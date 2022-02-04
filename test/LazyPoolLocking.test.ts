@@ -5,7 +5,7 @@ import chaiAsPromised from 'chai-as-promised';
 import { ethers } from 'hardhat';
 import { DoubleDiceToken, DoubleDiceLazyPoolLocking, DoubleDiceToken__factory, DoubleDiceLazyPoolLocking__factory } from '../typechain-types';
 
-import { $, currentBlockTime } from './lib/utils';
+import { $, currentBlockTime, forwardTime } from './lib/utils';
 
 chai.use(chaiAsPromised);
 
@@ -287,88 +287,6 @@ describe('DoubleDiceTokenLocking', () => {
 
   });
 
-  describe('topUpLock', async () => {
-
-    it('Should fail if top up amount is zero', async () => {
-      const token = await new DoubleDiceToken__factory(tokenOwner).deploy(
-        TOTAL_SUPPLY,
-        TOTAL_YIELD_AMOUNT,
-        tokenHolder.address
-      );
-
-      const tokenLocking = await new DoubleDiceLazyPoolLocking__factory(tokenLockingDeployer).deploy(
-        token.address,
-        MINIMIUM_LOCK_AMOUNT
-      );
-
-      const timestamp = (today.setDate(today.getDate() + 365)) / 1000;
-      const expiryTime = Math.floor(timestamp);
-
-      await token.connect(tokenHolder).transfer(USER1.address, $(3_000));
-      await token.connect(USER1).approve(tokenLocking.address, $(3_000));
-
-      await tokenLocking.connect(USER1).createLock($(1_000), expiryTime);
-
-      await expect(
-        tokenLocking.connect(tokenHolder).topUpLock('0')
-      ).to.be.revertedWith('Top up amount must be greater than zero');
-
-    });
-
-    it('Should fail if user have not created a lock', async () => {
-      const token = await new DoubleDiceToken__factory(tokenOwner).deploy(
-        TOTAL_SUPPLY,
-        TOTAL_YIELD_AMOUNT,
-        tokenHolder.address
-      );
-
-      const tokenLocking = await new DoubleDiceLazyPoolLocking__factory(tokenLockingDeployer).deploy(
-        token.address,
-        MINIMIUM_LOCK_AMOUNT
-      );
-
-      await token.connect(tokenHolder).transfer(USER1.address, $(3_000));
-
-      await expect(
-        tokenLocking.connect(tokenHolder).topUpLock($(1_000))
-      ).to.be.revertedWith('User have not created a lock');
-
-    });
-
-    it('Should check succesful top up', async () => {
-      token = await new DoubleDiceToken__factory(tokenOwner).deploy(
-        TOTAL_SUPPLY,
-        TOTAL_YIELD_AMOUNT,
-        tokenHolder.address
-      );
-
-      tokenLocking = await new DoubleDiceLazyPoolLocking__factory(tokenLockingDeployer).deploy(
-        token.address,
-        MINIMIUM_LOCK_AMOUNT
-      );
-
-      const timestamp = (today.setDate(today.getDate() + 365)) / 1000;
-      const expiryTime = Math.floor(timestamp);
-
-      await token.connect(tokenHolder).transfer(USER1.address, $(4_000));
-      await token.connect(USER1).approve(tokenLocking.address, $(4_000));
-
-      await tokenLocking.connect(USER1).createLock($(1_000), expiryTime);
-
-      expect(
-        (await tokenLocking.connect(USER1).getUserLockInfo(USER1.address)).amount
-      ).to.eq($(1_000));
-
-      await tokenLocking.connect(USER1).topUpLock($(1_000));
-
-      expect(
-        (await tokenLocking.connect(USER1).getUserLockInfo(USER1.address)).amount
-      ).to.eq($(2_000));
-
-    });
-
-  });
-
   describe('updateMinLockAmount', async () => {
 
     it('Should fail if new amount is zero', async () => {
@@ -524,41 +442,6 @@ describe('DoubleDiceTokenLocking', () => {
 
   describe('updateLockExpiry', async () => {
 
-    it('should not be able update lock expiry', async () => {
-      token = await new DoubleDiceToken__factory(tokenOwner).deploy(
-        TOTAL_SUPPLY,
-        TOTAL_YIELD_AMOUNT,
-        tokenHolder.address
-      );
-
-
-      tokenLocking = await new DoubleDiceLazyPoolLocking__factory(tokenLockingDeployer).deploy(
-        token.address,
-        MINIMIUM_LOCK_AMOUNT
-      );
-
-      await token.connect(tokenHolder).approve(tokenLocking.address, TOTAL_YIELD_AMOUNT.toString());
-
-      const timestamp = (today.setDate(today.getDate() + 365)) / 1000;
-      const expiryTime = Math.floor(timestamp);
-      const newTimeStamp = (await currentBlockTime()) + 3;
-      const tokenAmount = $(1_000);
-
-      await (await tokenLocking.connect(tokenLockingDeployer).updateMinLockDuration(1)).wait();
-      await tokenLocking.connect(tokenHolder).createLock(tokenAmount, newTimeStamp);
-
-      await expect(
-        tokenLocking.connect(tokenHolder).updateLockExpiry(888888)
-      ).to.be.revertedWith('Low new expiry date');
-
-      await tokenLocking.connect(tokenHolder).claim();
-
-      await expect(
-        tokenLocking.connect(tokenHolder).updateLockExpiry(expiryTime)
-      ).to.be.revertedWith('Asset have already been claimed');
-
-    });
-
     it('should update lock expiry', async () => {
       const token = await new DoubleDiceToken__factory(tokenOwner).deploy(
         TOTAL_SUPPLY,
@@ -591,7 +474,7 @@ describe('DoubleDiceTokenLocking', () => {
 
       const lockDetails = await tokenLocking.connect(tokenHolder).getUserLockInfo(tokenHolder.address);
       expect(lockDetails.expiryTime).to.eq(newExpiryTime1);
-      
+
       await tokenLocking.connect(tokenHolder).updateLockExpiry(newExpiryTime2);
 
       expect(
@@ -601,6 +484,157 @@ describe('DoubleDiceTokenLocking', () => {
 
     });
 
+    it('should not be able update lock expiry', async () => {
+      const token = await new DoubleDiceToken__factory(tokenOwner).deploy(
+        TOTAL_SUPPLY,
+        TOTAL_YIELD_AMOUNT,
+        tokenHolder.address
+      );
+
+      const tokenLocking = await new DoubleDiceLazyPoolLocking__factory(tokenLockingDeployer).deploy(
+        token.address,
+        MINIMIUM_LOCK_AMOUNT
+      );
+
+      await token.connect(tokenHolder).approve(tokenLocking.address, TOTAL_YIELD_AMOUNT.toString());
+
+      const timestamp = (today.setDate(today.getDate() + 365)) / 1000;
+      const expiryTime = Math.floor(timestamp);
+      const newTimeStamp = (await currentBlockTime()) + 100;
+      const tokenAmount = $(1_000);
+
+      await (await tokenLocking.connect(tokenLockingDeployer).updateMinLockDuration(1)).wait();
+      await tokenLocking.connect(tokenHolder).createLock(tokenAmount, newTimeStamp);
+
+      await expect(
+        tokenLocking.connect(tokenHolder).updateLockExpiry(newTimeStamp - 300)
+      ).to.be.revertedWith('Low new expiry date');
+
+      await forwardTime(newTimeStamp + 100);
+
+      await tokenLocking.connect(tokenHolder).claim();
+
+      await expect(
+        tokenLocking.connect(tokenHolder).updateLockExpiry(expiryTime)
+      ).to.be.revertedWith('Asset have already been claimed');
+
+    });
+
+    
+  });
+
+  describe('topUpLock', async () => {
+
+    it('Should fail if top up amount is zero', async () => {
+      const token = await new DoubleDiceToken__factory(tokenOwner).deploy(
+        TOTAL_SUPPLY,
+        TOTAL_YIELD_AMOUNT,
+        tokenHolder.address
+      );
+
+      const tokenLocking = await new DoubleDiceLazyPoolLocking__factory(tokenLockingDeployer).deploy(
+        token.address,
+        MINIMIUM_LOCK_AMOUNT
+      );
+
+      const minLockDuration = await tokenLocking.connect(tokenHolder).minLockDuration();
+      const expiryTime = (await currentBlockTime()) + Number(minLockDuration) + Number(minLockDuration);
+
+      await token.connect(tokenHolder).transfer(USER1.address, $(3_000));
+      await token.connect(USER1).approve(tokenLocking.address, $(3_000));
+
+      await tokenLocking.connect(USER1).createLock($(1_000), expiryTime);
+
+      await expect(
+        tokenLocking.connect(tokenHolder).topUpLock('0')
+      ).to.be.revertedWith('Top up amount must be greater than zero');
+
+    });
+
+    it('Should fail if user have not created a lock', async () => {
+      const token = await new DoubleDiceToken__factory(tokenOwner).deploy(
+        TOTAL_SUPPLY,
+        TOTAL_YIELD_AMOUNT,
+        tokenHolder.address
+      );
+
+      const tokenLocking = await new DoubleDiceLazyPoolLocking__factory(tokenLockingDeployer).deploy(
+        token.address,
+        MINIMIUM_LOCK_AMOUNT
+      );
+
+      await token.connect(tokenHolder).transfer(USER1.address, $(3_000));
+
+      await expect(
+        tokenLocking.connect(tokenHolder).topUpLock($(1_000))
+      ).to.be.revertedWith('User have not created a lock');
+
+    });
+
+    it('Should check succesful top up', async () => {
+      token = await new DoubleDiceToken__factory(tokenOwner).deploy(
+        TOTAL_SUPPLY,
+        TOTAL_YIELD_AMOUNT,
+        tokenHolder.address
+      );
+
+      tokenLocking = await new DoubleDiceLazyPoolLocking__factory(tokenLockingDeployer).deploy(
+        token.address,
+        MINIMIUM_LOCK_AMOUNT
+      );
+
+      const minLockDuration = await tokenLocking.connect(tokenHolder).minLockDuration();
+      const expiryTime = (await currentBlockTime()) + Number(minLockDuration) + Number(minLockDuration);
+
+      await token.connect(tokenHolder).transfer(USER1.address, $(4_000));
+      await token.connect(USER1).approve(tokenLocking.address, $(4_000));
+
+      await tokenLocking.connect(USER1).createLock($(1_000), expiryTime);
+
+      expect(
+        (await tokenLocking.connect(USER1).getUserLockInfo(USER1.address)).amount
+      ).to.eq($(1_000));
+
+      await tokenLocking.connect(USER1).topUpLock($(1_000));
+
+      expect(
+        (await tokenLocking.connect(USER1).getUserLockInfo(USER1.address)).amount
+      ).to.eq($(2_000));
+
+    });
+
+    it('Should fail if lock expiry date have already been reached', async () => {
+      const token = await new DoubleDiceToken__factory(tokenOwner).deploy(
+        TOTAL_SUPPLY,
+        TOTAL_YIELD_AMOUNT,
+        tokenHolder.address
+      );
+
+      const tokenLocking = await new DoubleDiceLazyPoolLocking__factory(tokenLockingDeployer).deploy(
+        token.address,
+        MINIMIUM_LOCK_AMOUNT
+      );
+
+      const minLockDuration = await tokenLocking.connect(tokenHolder).minLockDuration();
+      const expiryTime = (await currentBlockTime()) + Number(minLockDuration) + Number(minLockDuration);
+
+
+      await token.connect(tokenHolder).transfer(USER1.address, $(4_000));
+      await token.connect(USER1).approve(tokenLocking.address, $(4_000));
+
+      await tokenLocking.connect(USER1).createLock($(1_000), expiryTime);
+
+      expect(
+        (await tokenLocking.connect(USER1).getUserLockInfo(USER1.address)).amount
+      ).to.eq($(1_000));
+
+      await forwardTime(expiryTime + 100);
+
+      await expect(
+        tokenLocking.connect(USER1).topUpLock($(1_000))
+      ).to.be.revertedWith('Expiry Date have been reached');
+
+    });
 
   });
 

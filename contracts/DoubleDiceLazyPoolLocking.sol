@@ -80,6 +80,8 @@ contract DoubleDiceLazyPoolLocking is Ownable, ReentrancyGuard {
     UserLock storage user = userLock[msg.sender];
     require(amount > 0, "Top up amount must be greater than zero");
     require(user.hasLock, "User have not created a lock");
+    require(block.timestamp < user.expiryTime, "Expiry Date have been reached");
+
 
     user.amount += amount;
     
@@ -94,7 +96,9 @@ contract DoubleDiceLazyPoolLocking is Ownable, ReentrancyGuard {
     UserLock storage user = userLock[msg.sender];
     
     require(block.timestamp >= user.expiryTime, "Asset have not expired");
+    require(user.hasLock, "User have not created a lock");
     require(!user.claimed, "Asset have already been claimed");
+
     
     user.claimed = true;
     
@@ -109,6 +113,7 @@ contract DoubleDiceLazyPoolLocking is Ownable, ReentrancyGuard {
     
     require(!user.claimed, "Asset have already been claimed");
     require(user.hasLock, "User have not created a lock");
+    require(block.timestamp < oldExpiryTime, "Expiry Date have been reached");
     require(newExpiryTime > oldExpiryTime, "Low new expiry date");
     
     user.expiryTime = newExpiryTime;
