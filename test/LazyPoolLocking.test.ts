@@ -61,7 +61,7 @@ describe('DoubleDiceTokenLocking', () => {
         MINIMIUM_LOCK_AMOUNT
       );
 
-      await token.connect(tokenHolder).approve(tokenLocking.address, MINIMIUM_LOCK_AMOUNT.toString());
+      await token.connect(tokenHolder).approve(tokenLocking.address, MINIMIUM_LOCK_AMOUNT);
 
       expect(await tokenLocking.token()).to.eq(token.address);
     });
@@ -78,7 +78,7 @@ describe('DoubleDiceTokenLocking', () => {
         MINIMIUM_LOCK_AMOUNT
       );
 
-      await token.connect(tokenHolder).approve(tokenLocking.address, MINIMIUM_LOCK_AMOUNT.toString());
+      await token.connect(tokenHolder).approve(tokenLocking.address, MINIMIUM_LOCK_AMOUNT);
 
       expect(await tokenLocking.minLockAmount()).to.eq(MINIMIUM_LOCK_AMOUNT);
 
@@ -101,7 +101,7 @@ describe('DoubleDiceTokenLocking', () => {
         MINIMIUM_LOCK_AMOUNT
       );
 
-      await token.connect(tokenHolder).approve(tokenLocking.address, MINIMIUM_LOCK_AMOUNT.toString());
+      await token.connect(tokenHolder).approve(tokenLocking.address, MINIMIUM_LOCK_AMOUNT);
 
       await expect(
         tokenLocking.connect(tokenHolder).createLock($(1_000), 0)
@@ -122,7 +122,7 @@ describe('DoubleDiceTokenLocking', () => {
         MINIMIUM_LOCK_AMOUNT
       );
 
-      await token.connect(tokenHolder).approve(tokenLocking.address, MINIMIUM_LOCK_AMOUNT.toString());
+      await token.connect(tokenHolder).approve(tokenLocking.address, MINIMIUM_LOCK_AMOUNT);
 
       const expiryTime = Math.floor((new Date().setDate(new Date().getDate() + 30)) / 1000);
 
@@ -144,7 +144,7 @@ describe('DoubleDiceTokenLocking', () => {
         MINIMIUM_LOCK_AMOUNT
       );
 
-      await token.connect(tokenHolder).approve(tokenLocking.address, MINIMIUM_LOCK_AMOUNT.toString());
+      await token.connect(tokenHolder).approve(tokenLocking.address, MINIMIUM_LOCK_AMOUNT);
 
       const timestamp = (today.setDate(today.getDate() + 366)) / 1000;
       const expiryTime = Math.floor(timestamp);
@@ -167,7 +167,7 @@ describe('DoubleDiceTokenLocking', () => {
         MINIMIUM_LOCK_AMOUNT
       );
 
-      await token.connect(tokenHolder).approve(tokenLocking.address, MINIMIUM_LOCK_AMOUNT.toString());
+      await token.connect(tokenHolder).approve(tokenLocking.address, MINIMIUM_LOCK_AMOUNT);
 
       const timestamp = (today.setDate(today.getDate() + 365)) / 1000;
       const expiryTime = Math.floor(timestamp);
@@ -178,20 +178,20 @@ describe('DoubleDiceTokenLocking', () => {
 
       const event = contractReceipt.events?.find(event => event.event === 'UserLockInfo');
 
-      if (event) {
-        const user = event.args?.['user'];
-        const amount = event.args?.['amount'];
-        const startTime = event.args?.['startTime'];
-        const expiry = event.args?.['expiryTime'];
-
-        expect(user).to.eq(tokenHolder.address);
-        expect(amount).to.eq($(1_000));
-        expect(startTime).to.eq(blockTimestamp);
-        expect(expiry).to.eq(expiryTime);
-
-      }
+      expect(event).to.not.be.undefined; 
 
 
+      const user = event!.args?.['user'];
+      const amount = event!.args?.['amount'];
+      const startTime = event!.args?.['startTime'];
+      const expiry = event!.args?.['expiryTime'];
+
+      expect(user).to.eq(tokenHolder.address);
+      expect(amount).to.eq($(1_000));
+      expect(startTime).to.eq(blockTimestamp);
+      expect(expiry).to.eq(expiryTime);
+
+      
     });
 
     it('Should not be able to create multiple lock from user', async () => {
@@ -206,7 +206,7 @@ describe('DoubleDiceTokenLocking', () => {
         MINIMIUM_LOCK_AMOUNT
       );
 
-      await token.connect(USER2).approve(tokenLocking.address, TOTAL_YIELD_AMOUNT.toString());
+      await token.connect(USER2).approve(tokenLocking.address, TOTAL_YIELD_AMOUNT);
 
       const timestamp = (today.setDate(today.getDate() + 365)) / 1000;
       const expiryTime = Math.floor(timestamp);
@@ -232,14 +232,16 @@ describe('DoubleDiceTokenLocking', () => {
       );
 
 
-      await token.connect(tokenHolder).approve(tokenLocking.address, TOTAL_YIELD_AMOUNT.toString());
+      await token.connect(tokenHolder).approve(tokenLocking.address, TOTAL_YIELD_AMOUNT);
       const tokenAmount = $(1_000);
       const timestamp = (today.setDate(today.getDate() + 365)) / 1000;
       const expiryTime = Math.floor(timestamp);
+      
+      expect(await token.balanceOf(tokenLocking.address)).to.eq(0);
 
       await tokenLocking.connect(tokenHolder).createLock($(1_000), expiryTime);
 
-      expect(await token.balanceOf(tokenLocking.address)).to.eq(tokenAmount.toString());
+      expect(await token.balanceOf(tokenLocking.address)).to.eq(tokenAmount);
 
 
     });
@@ -277,7 +279,7 @@ describe('DoubleDiceTokenLocking', () => {
 
       expect(
         (await tokenLocking.connect(USER1).getUserLockInfo(USER1.address)).amount
-      ).to.eq(amount.toString());
+      ).to.eq(amount);
 
       expect(
         (await tokenLocking.connect(USER1).getUserLockInfo(USER1.address)).expiryTime
@@ -361,7 +363,7 @@ describe('DoubleDiceTokenLocking', () => {
         MINIMIUM_LOCK_AMOUNT
       );
 
-      await token.connect(tokenHolder).approve(tokenLocking.address, MINIMIUM_LOCK_AMOUNT.toString());
+      await token.connect(tokenHolder).approve(tokenLocking.address, MINIMIUM_LOCK_AMOUNT);
 
       const timestamp = (today.setDate(today.getDate() + 365)) / 1000;
       const expiryTime = Math.floor(timestamp);
@@ -387,7 +389,7 @@ describe('DoubleDiceTokenLocking', () => {
         MINIMIUM_LOCK_AMOUNT
       );
 
-      await token.connect(tokenHolder).approve(tokenLocking.address, TOTAL_YIELD_AMOUNT.toString());
+      await token.connect(tokenHolder).approve(tokenLocking.address, TOTAL_YIELD_AMOUNT);
 
       const newTimeStamp = (await currentBlockTime()) + 3;
       const tokenAmount = $(1_000);
@@ -416,7 +418,7 @@ describe('DoubleDiceTokenLocking', () => {
         MINIMIUM_LOCK_AMOUNT
       );
 
-      await token.connect(tokenHolder).approve(tokenLocking.address, TOTAL_YIELD_AMOUNT.toString());
+      await token.connect(tokenHolder).approve(tokenLocking.address, TOTAL_YIELD_AMOUNT);
 
       const newTimeStamp = (await currentBlockTime()) + 3;
       const tokenAmount = $(1_000);
@@ -427,13 +429,13 @@ describe('DoubleDiceTokenLocking', () => {
 
       await tokenLocking.connect(tokenHolder).createLock(tokenAmount, newTimeStamp);
 
-      expect(await token.balanceOf(tokenHolder.address)).to.eq(newBalance.toString());
+      expect(await token.balanceOf(tokenHolder.address)).to.eq(newBalance);
 
       expect(await tokenLocking.connect(tokenHolder).claim())
         .to.emit(tokenLocking, 'Claim')
         .withArgs(tokenHolder.address, tokenAmount);
 
-      expect(await token.balanceOf(tokenHolder.address)).to.eq(ownerBalance.toString());
+      expect(await token.balanceOf(tokenHolder.address)).to.eq(ownerBalance);
 
     });
 
@@ -453,7 +455,7 @@ describe('DoubleDiceTokenLocking', () => {
         token.address,
         MINIMIUM_LOCK_AMOUNT
       );
-      await token.connect(tokenHolder).approve(tokenLocking.address, TOTAL_YIELD_AMOUNT.toString());
+      await token.connect(tokenHolder).approve(tokenLocking.address, TOTAL_YIELD_AMOUNT);
 
       let timestamp = (today.setDate(today.getDate() + 366)) / 1000;
       const oldExpiryTime = Math.floor(timestamp);
@@ -496,7 +498,7 @@ describe('DoubleDiceTokenLocking', () => {
         MINIMIUM_LOCK_AMOUNT
       );
 
-      await token.connect(tokenHolder).approve(tokenLocking.address, TOTAL_YIELD_AMOUNT.toString());
+      await token.connect(tokenHolder).approve(tokenLocking.address, TOTAL_YIELD_AMOUNT);
 
       const timestamp = (today.setDate(today.getDate() + 365)) / 1000;
       const expiryTime = Math.floor(timestamp);
