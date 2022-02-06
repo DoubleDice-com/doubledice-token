@@ -17,6 +17,8 @@
     "predeploy:token:local": "npm run cp-local-env",
     "deploy:token:local": "  npm run clean && hardhat run --network local   ./scripts/deploy-token.ts",
     "deploy:tokenlock:local": "  npm run clean && hardhat run --network local   ./scripts/deploy-tokenlock.ts",
+    "deploy:lazyPoolLock:local": "  npm run clean && hardhat run --network local   ./scripts/deploy-lazy-pool-lock.ts",
+    "deploy:lazyPoolLock:mumbai": "  npm run clean && hardhat run --network mumbai   ./scripts/deploy-lazy-pool-lock.ts",
     "deploy:token:rinkeby": "npm run clean && hardhat run --network rinkeby ./scripts/deploy-token.ts",
     "deploy:token:goerli": " npm run clean && hardhat run --network goerli  ./scripts/deploy-token.ts",
     "deploy:token:mumbai": " npm run clean && hardhat run --network mumbai  ./scripts/deploy-token.ts",
