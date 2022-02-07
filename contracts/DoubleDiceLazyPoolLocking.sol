@@ -96,14 +96,15 @@ contract DoubleDiceLazyPoolLocking is Ownable {
     
     require(block.timestamp >= user.expiryTime, "Asset have not expired");
     require(user.hasLock, "User have not created a lock");
-    require(!user.claimed, "Asset have already been claimed");
+    
+    uint256 amount = user.amount;
+    
+    delete userLock[msg.sender];
+
+    token.transfer(msg.sender, amount);
 
     
-    user.claimed = true;
-    
-    token.transfer(msg.sender, user.amount);
-    
-    emit Claim(msg.sender,user.amount);
+    emit Claim(msg.sender,amount);
   }
 
   function updateLockExpiry(uint256 newExpiryTime) external {
