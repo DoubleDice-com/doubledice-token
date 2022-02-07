@@ -135,6 +135,19 @@
     "type": "event"
   },
   {
+    "inputs": [
+      {
+        "internalType": "bytes32",
+        "name": "c__0x27a8e38e",
+        "type": "bytes32"
+      }
+    ],
+    "name": "c_0x27a8e38e",
+    "outputs": [],
+    "stateMutability": "pure",
+    "type": "function"
+  },
+  {
     "inputs": [],
     "name": "claim",
     "outputs": [],

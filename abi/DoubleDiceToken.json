@@ -253,6 +253,19 @@
     "type": "function"
   },
   {
+    "inputs": [
+      {
+        "internalType": "bytes32",
+        "name": "c__0x028ff74c",
+        "type": "bytes32"
+      }
+    ],
+    "name": "c_0x028ff74c",
+    "outputs": [],
+    "stateMutability": "pure",
+    "type": "function"
+  },
+  {
     "inputs": [],
     "name": "claimYield",
     "outputs": [],

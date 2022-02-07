@@ -50,6 +50,19 @@
   {
     "inputs": [
       {
+        "internalType": "bytes32",
+        "name": "c__0x875659c0",
+        "type": "bytes32"
+      }
+    ],
+    "name": "c_0x875659c0",
+    "outputs": [],
+    "stateMutability": "pure",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
         "internalType": "address",
         "name": "_dodiOwner",
         "type": "address"

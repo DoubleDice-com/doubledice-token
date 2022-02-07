@@ -351,14 +351,14 @@ describe('DoubleDiceTokenLocking', () => {
   describe('claim', async () => {
 
     it('should check if claim have expired', async () => {
-      token = await new DoubleDiceToken__factory(tokenOwner).deploy(
+      const token = await new DoubleDiceToken__factory(tokenOwner).deploy(
         TOTAL_SUPPLY,
         TOTAL_YIELD_AMOUNT,
         tokenHolder.address
       );
 
 
-      tokenLocking = await new DoubleDiceLazyPoolLocking__factory(tokenLockingDeployer).deploy(
+      const tokenLocking = await new DoubleDiceLazyPoolLocking__factory(tokenLockingDeployer).deploy(
         token.address,
         MINIMIUM_LOCK_AMOUNT
       );
@@ -377,14 +377,14 @@ describe('DoubleDiceTokenLocking', () => {
     });
 
     it('should check if token have been claimed', async () => {
-      token = await new DoubleDiceToken__factory(tokenOwner).deploy(
+      const token = await new DoubleDiceToken__factory(tokenOwner).deploy(
         TOTAL_SUPPLY,
         TOTAL_YIELD_AMOUNT,
         tokenHolder.address
       );
 
 
-      tokenLocking = await new DoubleDiceLazyPoolLocking__factory(tokenLockingDeployer).deploy(
+      const tokenLocking = await new DoubleDiceLazyPoolLocking__factory(tokenLockingDeployer).deploy(
         token.address,
         MINIMIUM_LOCK_AMOUNT
       );
@@ -399,21 +399,22 @@ describe('DoubleDiceTokenLocking', () => {
       await tokenLocking.connect(tokenHolder).createLock(tokenAmount, newTimeStamp);
 
       await tokenLocking.connect(tokenHolder).claim();
+
       await expect(
         tokenLocking.connect(tokenHolder).claim()
-      ).to.be.revertedWith('Asset have already been claimed');
+      ).to.be.revertedWith('User have not created a lock');
 
     });
 
     it('should check successful claim', async () => {
-      token = await new DoubleDiceToken__factory(tokenOwner).deploy(
+      const token = await new DoubleDiceToken__factory(tokenOwner).deploy(
         TOTAL_SUPPLY,
         TOTAL_YIELD_AMOUNT,
         tokenHolder.address
       );
 
 
-      tokenLocking = await new DoubleDiceLazyPoolLocking__factory(tokenLockingDeployer).deploy(
+      const tokenLocking = await new DoubleDiceLazyPoolLocking__factory(tokenLockingDeployer).deploy(
         token.address,
         MINIMIUM_LOCK_AMOUNT
       );
@@ -436,6 +437,51 @@ describe('DoubleDiceTokenLocking', () => {
         .withArgs(tokenHolder.address, tokenAmount);
 
       expect(await token.balanceOf(tokenHolder.address)).to.eq(ownerBalance);
+
+    });
+
+    it('should be able to create more locks after each claim', async () => {
+      const token = await new DoubleDiceToken__factory(tokenOwner).deploy(
+        TOTAL_SUPPLY,
+        TOTAL_YIELD_AMOUNT,
+        tokenHolder.address
+      );
+
+
+      const tokenLocking = await new DoubleDiceLazyPoolLocking__factory(tokenLockingDeployer).deploy(
+        token.address,
+        MINIMIUM_LOCK_AMOUNT
+      );
+
+      await token.connect(tokenHolder).approve(tokenLocking.address, TOTAL_YIELD_AMOUNT);
+
+      const newTimeStamp = (await currentBlockTime()) + 3;
+      const tokenAmount = $(1_000);
+      const ownerBalance = await token.balanceOf(tokenHolder.address);
+      const newBalance = ownerBalance.sub(tokenAmount);
+
+      await (await tokenLocking.connect(tokenLockingDeployer).updateMinLockDuration(1)).wait();
+
+      await tokenLocking.connect(tokenHolder).createLock(tokenAmount, newTimeStamp);
+
+      expect(await token.balanceOf(tokenHolder.address)).to.eq(newBalance);
+
+      await tokenLocking.connect(tokenHolder).claim();        
+
+      expect(await token.balanceOf(tokenHolder.address)).to.eq(ownerBalance);
+
+      const newTimeStampForSecondLock = newTimeStamp + 86400;
+
+      await tokenLocking.connect(tokenHolder).createLock(tokenAmount, newTimeStampForSecondLock);
+
+      expect(
+        (await tokenLocking.connect(tokenHolder).getUserLockInfo(tokenHolder.address)).expiryTime
+      ).to.eq(newTimeStampForSecondLock);
+
+      expect(
+        (await tokenLocking.connect(tokenHolder).getUserLockInfo(tokenHolder.address)).amount
+      ).to.eq(tokenAmount);
+
 
     });
 
@@ -518,7 +564,7 @@ describe('DoubleDiceTokenLocking', () => {
 
       await expect(
         tokenLocking.connect(tokenHolder).updateLockExpiry(expiryTime)
-      ).to.be.revertedWith('Asset have already been claimed');
+      ).to.be.revertedWith('User have not created a lock');
 
     });
 

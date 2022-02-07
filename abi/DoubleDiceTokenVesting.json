@@ -127,6 +127,19 @@
     "type": "event"
   },
   {
+    "inputs": [
+      {
+        "internalType": "bytes32",
+        "name": "c__0x574634cf",
+        "type": "bytes32"
+      }
+    ],
+    "name": "c_0x574634cf",
+    "outputs": [],
+    "stateMutability": "pure",
+    "type": "function"
+  },
+  {
     "inputs": [],
     "name": "calculateGrantClaim",
     "outputs": [
